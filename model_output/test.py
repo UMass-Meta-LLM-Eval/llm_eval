@@ -9,8 +9,6 @@ if not torch.cuda.is_available():
 else:
     print(torch.cuda.get_device_name(0))
 
-exit(0)
-
 model = "meta-llama/Llama-2-7b-chat-hf" # meta-llama/Llama-2-7b-hf
 
 tokenizer = AutoTokenizer.from_pretrained(model, use_auth_token=True)
@@ -21,6 +19,8 @@ llama_pipeline = pipeline(
     torch_dtype=torch.float16,
     device_map="auto",
 )
+
+print('Pipeline Generated!')
 
 def get_llama_response(prompt: str) -> None:
     """
@@ -43,6 +43,6 @@ def get_llama_response(prompt: str) -> None:
     print("Chatbot:", sequences[0]['generated_text'])
 
 
-
+print('Prompting!\n')
 prompt = 'What is the Capital of India?\n'
 print(get_llama_response(prompt))
