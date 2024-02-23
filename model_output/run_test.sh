@@ -8,5 +8,5 @@
 #SBATCH --constraint=a100
 #SBATCH -o generate_id-%j.out
 
-#conda run -n llm-parsing python /home/amansinghtha_umass_edu/llm_eval/model_output/test_mmlu.py
-conda run -n llm-parsing python /home/amansinghtha_umass_edu/llm_eval/model_output/generate_model_output.py
+conda run -n llm-parsing python /home/amansinghtha_umass_edu/llm_eval/model_output/test_mmlu.py
+#conda run -n llm-parsing python /home/amansinghtha_umass_edu/llm_eval/model_output/generate_model_output.py

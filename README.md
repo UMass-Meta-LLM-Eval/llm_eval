@@ -1,19 +1,27 @@
 # README
 
+## Important Destinations
 Project root on unity: `/work/pi_dhruveshpate_umass_edu/grp22/`
-
 Repo: `/work/pi_dhruveshpate_umass_edu/grp22/src/llm_eval`
-
 Conda env: `/work/pi_dhruveshpate_umass_edu/grp22/conda/envs/llm-eval`
 
-pip install -r requirements.txt
+## Creating Personal Environments
+`conda create --name llm-parsing python=3.9.7 pip`
+`pip install -r requirements.txt`
+`conda activate llm-parsing`
 
-conda create --name llm-parsing python=3.9.7 pip
+## Running Model Output Pipeline
+Model Output Pipeline will cache all the LLM responses based on hyper-parameters
+Hyper-parameters with model and benchmark name in `model_output/configs/`
+Running on Slurm - `sbatch run_generate_model_output.sh`
 
-Hugging face Login
-https://huggingface.co/docs/huggingface_hub/en/quick-start
+Running Locally -
+`conda activate /work/pi_dhruveshpate_umass_edu/grp22/conda/envs/llm-eval`
+`mongod --dbpath /work/pi_dhruveshpate_umass_edu/grp22/db`
+`python model_output/generate_model_output.py`
+`python model_output/retrieve_model_output.py`
 
-srun  --partition gpu-preempt --gres=gpu:1 -t 0-01:00:00 --pty --constraint=a100 conda run -n llm-parsing p
-ython /home/amansinghtha_umass_edu/llm_eval/model_output/test.py
+
+
 
 

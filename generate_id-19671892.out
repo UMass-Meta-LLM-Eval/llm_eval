@@ -1,11 +1,0 @@
-/home/amansinghtha_umass_edu/.conda/envs/llm-parsing/lib/python3.9/site-packages/transformers/models/auto/tokenization_auto.py:711: FutureWarning: The `use_auth_token` argument is deprecated and will be removed in v5 of Transformers. Please use `token` instead.
-  warnings.warn(
-Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:02<00:02,  2.17s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:02<00:00,  1.37s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:02<00:00,  1.49s/it]
-Truncation was not explicitly activated but `max_length` is provided a specific value, please use `truncation=True` to explicitly truncate examples to max length. Defaulting to 'longest_first' truncation strategy. If you encode pairs of sequences (GLUE-style) with the tokenizer you can select this strategy more precisely by providing a specific strategy to `truncation`.
-
-ERROR conda.cli.main_run:execute(47): `conda run python /home/amansinghtha_umass_edu/llm_eval/model_output/generate_model_output.py` failed. (See above for error)
-NVIDIA A100-PCIE-40GB
-Pipeline Generated!
-Inserted benchmark result into MongoDB.
-{'benchmark': 'mmlu', 'metadata': {'subset': 'abstract_algebra', 'num_shots': 1}, 'model': {'name': 'meta-llama/llama-7b-chat-hf', 'hyperparams': {'max_length': 128}}, 'question': 'Let p = (1, 2, 5, 4)(2, 3) in S_5 . Find the index of <p> in S_5. A: 8, B: 2, C: 24, D: 120', 'prompt_prefix': '', 'prompt_suffix': ' A: 8, B: 2, C: 24, D: 120', 'response': b'CgpBbnN3ZXI6IEE6IDgKCkV4cGxhbmF0aW9uOgoKVG8gZmluZCB0aGUgaW5kZXggb2YgPHA+IGluIFNfNSwgd2UgbmVlZCB0byBmaW5kIHRoZSBudW1iZXIgb2YgZWxlbWVudHMgaW4gdGhlIGNvc2V0IDxwPi4KClRoZSBlbGVtZW50cyBvZiA8cD4gYXJlICgxLCAyLCA1LCA0KSgyLCAzKSwgd2hpY2ggY2FuIGJlIHdyaXR0ZW4gYXMgKDIsIDMsIDcsIDUpIGluIFNfNS4KClRoZXJlZm9yZSwgdGhlIGluZGV4IG9mIDxwPiBpbiBTXzUgaXMgOC4='}
-

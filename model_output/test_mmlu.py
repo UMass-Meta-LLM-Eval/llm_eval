@@ -60,11 +60,13 @@ for key in dataset:
     question = prompt_prefix+row['input']+prompt_suffix
     target = row['target']
     response = get_llama_response(question)
-    f1.write(response+'\n**\n')
-    f2.write(target+'\n**\n')
-    print(str(counter)+'/'+str(len(dataset[key])))
-f1.close()
-f2.close()
+    print(question, response)
+    exit(1)
+#     f1.write(response+'\n**\n')
+#     f2.write(target+'\n**\n')
+#     print(str(counter)+'/'+str(len(dataset[key])))
+# f1.close()
+# f2.close()
 
 
 
