@@ -1,0 +1,32 @@
+{
+    "evaluator": {
+        "name": "dummy_evaluator",
+        "cls": "DummyEvaluator"
+    },
+    "benchmarks": [
+        {
+            "name": "benchmark1",
+            "cls": "DummyBenchmark"
+        },
+        {
+            "name": "benchmark2",
+            "cls": "DummyBenchmark"
+        },
+        {
+            "name": "benchmark3",
+            "cls": "MMLUBenchmark"
+        }
+    ],
+    "models" : [
+        {
+            "name": "model1",
+            "cls": "DummyModel",
+            "prefix": "model1: "
+        },
+        {
+            "name": "model2",
+            "cls": "DummyModel",
+            "prefix": "model2: "
+        }
+    ]
+}
