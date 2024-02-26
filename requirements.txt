@@ -1,7 +1,6 @@
+numpy
 torch
-transformers
+transformers 
 accelerate
-tqdm
-python-dotenv
-lm-evaluation-harness @ git+https://github.com/EleutherAI/lm-evaluation-harness@main
-
+datasets
+pymongo
