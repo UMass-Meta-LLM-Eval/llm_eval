@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class BaseEvaluator(ABC):
 
     @abstractmethod
-    def evaluate(self, question, response, references, **kwargs)->bool:
+    def evaluate(self, question, response, references, **kwargs)->tuple[bool, dict]:
         ...
 
     def evaluate_batch(self, questions, responses, references_list, **kwargs):
@@ -22,8 +22,8 @@ class DummyEvaluator(BaseEvaluator):
         self._eval_config = eval_config
 
     def evaluate(self, question, response, references, **kwargs):
-        return True
-    
+        return True, {}
+
     @property
     def config(self):
         return self._eval_config
