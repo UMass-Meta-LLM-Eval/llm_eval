@@ -1,0 +1,15 @@
+{
+    "benchmarks": [
+        {
+            "name": "NaturalQuestions",
+            "cls": "NaturalQuestions"
+        }
+    ],
+    "models": [
+        {
+            "model": "meta-llama/Llama-2-7b-hf",
+            "cls": "LlamaModel",
+            "prefix": ""
+        }
+    ]
+}

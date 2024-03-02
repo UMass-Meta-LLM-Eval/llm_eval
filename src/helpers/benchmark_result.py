@@ -6,7 +6,7 @@ import json
 class BenchmarkDoc:
     
     def __init__(self, bm_config: dict, model_config: dict, 
-                 question: str, prompt: str, response: str):
+                 question: str, prompt: str, response: str, acceptable_answers: list):
         self.bm_config = bm_config
         self.model_config = model_config
         self.question = question
