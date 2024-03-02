@@ -19,12 +19,9 @@ def main():
         evaluators = [run_info['evaluator']]
     else:
         evaluators = run_info['evaluators']
-    for evaluator_cfg in evaluators:
-        evaluator = create_evaluator(evaluator_cfg)
-        for (bm_cfg, model_cfg) in product(run_info['benchmarks'], run_info['models']):
-            benchmark = create_benchmark(bm_cfg)
-            results = benchmark.compute_results(model_cfg, db, evaluator)
-            print(results)
+    for (bm_cfg, model_cfg) in product(run_info['benchmarks'], run_info['models']):
+        benchmark = create_benchmark(bm_cfg)
+        benchmark.inspect_results(db, model_cfg)
 
 
 if __name__ == '__main__':

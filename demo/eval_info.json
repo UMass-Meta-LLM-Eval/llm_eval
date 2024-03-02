@@ -1,20 +1,22 @@
 {
-    "evaluator": {
-        "name": "dummy_evaluator",
-        "cls": "DummyEvaluator"
-    },
+    "evaluators": [
+        {
+            "name": "exact_match",
+            "cls": "ExactMatchEvaluator"
+        },
+        {
+            "name": "contains",
+            "cls": "ContainsMatchEvaluator"
+        },
+        {
+            "name": "words",
+            "cls": "ContainsWordsEvaluator"
+        }
+    ],
     "benchmarks": [
         {
             "name": "benchmark1",
-            "cls": "DummyBenchmark"
-        },
-        {
-            "name": "benchmark2",
-            "cls": "DummyBenchmark"
-        },
-        {
-            "name": "benchmark3",
-            "cls": "MMLUBenchmark"
+            "cls": "DummyNQBenchmark"
         }
     ],
     "models" : [
@@ -22,11 +24,6 @@
             "name": "model1",
             "cls": "DummyModel",
             "prefix": "model1: "
-        },
-        {
-            "name": "model2",
-            "cls": "DummyModel",
-            "prefix": "model2: "
         }
     ]
 }
