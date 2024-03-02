@@ -1,6 +1,6 @@
-from abc import ABC, abstractmethod
+from .base_database import BaseDatabase
 
-class DummyMongoDB(ABC):
+class DummyMongoDB(BaseDatabase):
     def __init__(self, name, db_params):
         self._name = name
         self._db_params = db_params
@@ -8,9 +8,9 @@ class DummyMongoDB(ABC):
     def get_doc(self, db_name, coll_name, doc_id):
         return {
             'model': 'dummy',
-            'question': 'Q. When was the last time anyone was on the moon? A: ',
+            'question': 'When was the last time anyone was on the moon?',
             'prompt': 'Q. When was the last time anyone was on the moon? A: ',
-            'response': 'The last time anyone was on the moon was during the Apollo 17 mission in December 1972',
+            'response': 'VGhlIGxhc3QgdGltZSBhbnlvbmUgd2FzIG9uIHRoZSBtb29uIHdhcyBkdXJpbmcgdGhlIEFwb2xsbyAxNyBtaXNzaW9uIGluIERlY2VtYmVyIDE5NzI=',
             'accepted_answers' : ['14 December 1972 UTC', 'December 1972'],
         }
     

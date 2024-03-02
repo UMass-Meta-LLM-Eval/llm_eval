@@ -12,7 +12,6 @@ class BenchmarkDoc:
         self.question = question
         self.prompt = prompt
         self.response = response
-
     def to_json(self):
         return {
             'benchmark': self.bm_config,
@@ -20,14 +19,14 @@ class BenchmarkDoc:
             'question': self.question,
             'prompt': self.prompt,
             'response': self.response,
-            'evaluation': []}
-    
-    def __hash__(self) -> int:
+            'evaluation': {}}
+    def get_hash(self) -> int:
         """Return the SHA256 hash of the object."""
         json_str = json.dumps({
             'benchmark': self.bm_config,
             'model': self.model_config,
             'question': self.question,
             'prompt': self.prompt})
-        obj_bytes =  base64.b64encode(json_str.encode())
+        obj_bytes =  base64.b64encode(json_str.encode(encoding='utf-8'))
         return int(hashlib.sha256(obj_bytes).hexdigest(), 16)
+    
