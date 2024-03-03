@@ -14,7 +14,6 @@ class DummyNQBenchmark(BaseBenchmark):
                 'references': ['14 December 1972 UTC', 'December 1972']
             }
         ]
-        self._config['num_questions'] = len(self._dataset)
 
     def create_prompt(self, question, **kwargs):
         return f'Q. {question} A: '
@@ -22,9 +21,8 @@ class DummyNQBenchmark(BaseBenchmark):
     def run(self, model, db: BaseDatabase):
         for item in self._dataset:
             prompt = self.create_prompt(item['question'])
-            prediction = model.predict(prompt, b64_output=True)
-            doc = BenchmarkDoc(self._config, model.config, item['question'],
-                               prompt, prediction)
+            prediction = model.predict(prompt)
+            doc = BenchmarkDoc(self._config, model.config, prompt, prediction)
             db.add_doc('benchmark', 'nq_dummy', doc.get_hash(), doc.to_json())
 
     def compute_results(self, model_cfg: dict, db: BaseDatabase,
@@ -32,19 +30,19 @@ class DummyNQBenchmark(BaseBenchmark):
         scores = []
         for item in self._dataset:
             prompt = self.create_prompt(item['question'])
-            doc = BenchmarkDoc(self._config, model_cfg, item['question'],
-                               prompt, None)
+            doc = BenchmarkDoc(self._config, model_cfg, prompt)
             key = doc.get_hash()
             doc = db.get_doc('benchmark', 'nq_dummy', key)
-            prediction = base64.b64decode(doc['response']).decode('utf-8')
+            doc = BenchmarkDoc.from_json(doc)
+            prediction = doc.response
             result, info = evaluator.evaluate(item['question'], prediction,
                                         item['references'])
             eval_key = hex(evaluator.get_eval_key(key))
-            doc['evaluation'][eval_key] = {
+            doc.evaluation[eval_key] = {
                 'evaluator': evaluator.config,
                 'result': result,
                 'info': info}
-            db.add_doc('benchmark', 'nq_dummy', key, doc)
+            db.add_doc('benchmark', 'nq_dummy', key, doc.to_json())
             scores.append(int(result))
 
         return sum(scores) / len(scores)
@@ -52,24 +50,10 @@ class DummyNQBenchmark(BaseBenchmark):
     def inspect_results(self, db: BaseDatabase, model_cfg: dict):
         for item in self._dataset:
             prompt = self.create_prompt(item['question'])
-            doc = BenchmarkDoc(self._config, model_cfg, item['question'],
-                               prompt, None)
-            doc = db.get_doc('benchmark', 'nq_dummy', doc.get_hash())
-            print(f'Benchmark : {doc["benchmark"]["name"]}')
-            print(f'Model     : {doc["model"]["name"]}')
-            print(f'Question  : {doc["question"]}')
-            print(f'Prompt    : {doc["prompt"]}')
-            response = base64.b64decode(doc['response']).decode('utf-8')
-            print('References:')
-            for ref in item['references']:
-                print(f'  {ref}')
-            print(f'Response  : {response}')
-            print('Evaluations:')
-            for eval in doc['evaluation'].values():
-                print(f'  {eval["evaluator"]["name"]}: {eval["result"]}')
-                if eval.get('info', {}) != {}:
-                    print(f'    {eval["info"]}')
-            print()
+            doc = self._get_doc_from_db(db, model_cfg, prompt, 'nq_dummy')
+            doc.inspect(item['question'], item['references'])
+            if input() == 'q':
+                break
 
     @property
     def config(self):

@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import base64
+
 from ..helpers import BenchmarkDoc
 from ..database import BaseDatabase
 from ..evaluator import BaseEvaluator
@@ -33,11 +35,11 @@ class BaseBenchmark(ABC):
         stored in the given database."""
         ...
 
-    def inspect_results(self, db: BaseDatabase):
+    def inspect_results(self, db: BaseDatabase, model_cfg: dict) -> None:
         """Inspect the results of the benchmark stored in the given database.
         """
-        raise NotImplementedError("This benchmark does not support "
-                                  "inspecting results.")
+        raise NotImplementedError("This benchmark does not support inspecting "
+                                  "results.")
 
     @property
     @abstractmethod
@@ -45,14 +47,18 @@ class BaseBenchmark(ABC):
         """Return the benchmark's configuration."""
         ...
 
+    def _get_doc_from_db(self, db, bm_name, key):
+        doc = db.get_doc('benchmark', bm_name, key)
+        return BenchmarkDoc.from_json(doc)
+
 
 class DummyBenchmark(BaseBenchmark):
     def __init__(self, bm_config: dict):
         self._config = bm_config
         self._dataset = [
-            {'question': "What is the capital of France?",
-             'references': ["Paris"]},
-            {'question': "What is 2+2?", 'references': ["4", "four"]},
+            {'question': 'What is the capital of France?',
+             'references': ['Paris']},
+            {'question': 'What is 2+2?', 'references': ['4', 'four']},
         ]
 
     def create_prompt(self, question, **kwargs):
@@ -63,7 +69,7 @@ class DummyBenchmark(BaseBenchmark):
             prompt = self.create_prompt(item['question'])
             prediction = model.predict(prompt)
             doc = BenchmarkDoc(self._config, model.config,
-                               item['question'], prompt, prediction)
+                               prompt, prediction)
             db.add_doc('benchmark', 'test', doc.get_hash(), doc.to_json())
 
     def compute_results(self, model_cfg: dict, db: BaseDatabase,
@@ -71,8 +77,7 @@ class DummyBenchmark(BaseBenchmark):
         scores = []
         for item in self._dataset:
             prompt = self.create_prompt(item['question'])
-            doc = BenchmarkDoc(self._config, model_cfg, item['question'],
-                               prompt, None)
+            doc = BenchmarkDoc(self._config, model_cfg, prompt)
             key = doc.get_hash()
             doc = db.get_doc('benchmark', 'test', key)
             prediction = doc['response']

@@ -15,8 +15,8 @@ class BaseEvaluator(ABC):
     
     def get_eval_key(self, key):
         self_str = json.dumps(self.config)
-        encoded = base64.b64encode((hex(key)+self_str).encode('utf-8'))
-        return int(hashlib.sha256(encoded).hexdigest(), 16)
+        return int(hashlib.sha256(
+            (hex(key)+self_str).encode('utf-8')).hexdigest(), 16)
     
     @property
     @abstractmethod

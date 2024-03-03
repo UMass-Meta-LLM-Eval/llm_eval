@@ -15,15 +15,18 @@
     ],
     "benchmarks": [
         {
-            "name": "benchmark1",
-            "cls": "DummyNQBenchmark"
+            "name": "nq_poc-400-5shot",
+            "cls": "NaturalQuestionsBenchmark",
+            "seed": 42,
+            "num_samples": 5,
+            "num_fewshot": 5
         }
     ],
     "models" : [
         {
-            "name": "model1",
-            "cls": "DummyModel",
-            "prefix": "model1: "
+            "name": "llama2-7b-base",
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-7b-chat-hf"
         }
     ]
 }
