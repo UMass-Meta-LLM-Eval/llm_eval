@@ -10,18 +10,6 @@ Conda env: `/work/pi_dhruveshpate_umass_edu/grp22/conda/envs/llm-eval` <br />
 `pip install -r requirements.txt` <br />
 `conda activate llm-parsing` <br />
 
-## Running Model Output Pipeline
-Model Output Pipeline will cache all the LLM responses based on hyper-parameters
-Hyper-parameters with model and benchmark name in `model_output/configs/`
-Running on Slurm - `sbatch run_generate_model_output.sh`
-
-Running Locally - <br />
-`conda activate /work/pi_dhruveshpate_umass_edu/grp22/conda/envs/llm-eval` <br />
-`mongod --dbpath /work/pi_dhruveshpate_umass_edu/grp22/db` <br />
-`python model_output/generate_model_output.py` <br />
-`python model_output/retrieve_model_output.py` <br />
-
-
 ## Setup
 
 Activate a CPU interactive session and load modules:
@@ -42,4 +30,38 @@ For bigger GPU, set the constraint
 
 ```bash
 salloc -N 1 -n 1 -p gpu,gpu-preempt -t 2:00:00 --mem=8G --gpus=1 --constraint="[a100|m40|rtx8000]"
+```
+
+## Running a job
+
+The code for all the benchmarks and evaluation is in the `src` directory. In the root of the project, you can run the `main.py` driver script to run a job. The script takes a few arguments:
+
+1. `-b` or `--benchmark-config`: The name of the config JSON file in the `configs` directory. This file contains the configuration for the benchmark to run.
+
+2. `-e` or `--eval-config`: The name of the config JSON file in the `configs` directory. This file contains the configuration for the evaluation to run.
+
+3. `-i` or `--inspect-config`: The name of the config JSON file in the `configs` directory. This file contains the configuration for manual inspection of the model output, which will be printed to the console.
+
+For example, to run a benchmark job using the config present in `configs/benchmark.json`, you can run the following command:
+
+```bash
+python src/main.py -b benchmark
+```
+
+To run an evaluation job using the config present in `configs/evaluation.json`, you can run the following command:
+
+```bash
+python src/main.py -e evaluation
+```
+
+To run both the benchmark and evaluation in a single job, you can run the following command:
+
+```bash
+python src/main.py -b benchmark -e evaluation
+```
+
+To run an inspection job using the config present in `configs/inspection.json`, you can run the following command:
+
+```bash
+python src/main.py -i benchmark
 ```
