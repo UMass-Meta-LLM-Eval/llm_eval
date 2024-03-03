@@ -69,12 +69,13 @@ class DummyBenchmark(BaseBenchmark):
             key = hash(doc)
             doc = db.get_doc('benchmark', 'test', key)
             prediction = doc['response']
-            result = evaluator.evaluate(item['question'], prediction, item['references'])
+            success, result = evaluator.evaluate(item['question'], prediction, item['references'])
             doc['evaluation'].append({
                 'evaluator': evaluator.config,
                 'result': result})
             db.add_doc('benchmark', 'test', key, doc)
-            scores.append(int(result))
+            if success:
+                scores.append(1)
 
         return sum(scores) / len(scores)
     
