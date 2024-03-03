@@ -4,3 +4,4 @@ transformers
 accelerate
 datasets
 pymongo
+termcolor
