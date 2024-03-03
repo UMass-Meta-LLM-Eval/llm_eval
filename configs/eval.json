@@ -24,7 +24,7 @@
     ],
     "models" : [
         {
-            "name": "llama2-7b-base",
+            "name": "llama2-7b-chat",
             "cls": "LlamaModel",
             "model": "meta-llama/Llama-2-7b-chat-hf"
         }

@@ -45,23 +45,23 @@ The code for all the benchmarks and evaluation is in the `src` directory. In the
 For example, to run a benchmark job using the config present in `configs/benchmark.json`, you can run the following command:
 
 ```bash
-python src/main.py -b benchmark
+python main.py -b benchmark
 ```
 
 To run an evaluation job using the config present in `configs/evaluation.json`, you can run the following command:
 
 ```bash
-python src/main.py -e evaluation
+python main.py -e evaluation
 ```
 
 To run both the benchmark and evaluation in a single job, you can run the following command:
 
 ```bash
-python src/main.py -b benchmark -e evaluation
+python main.py -b benchmark -e evaluation
 ```
 
 To run an inspection job using the config present in `configs/inspection.json`, you can run the following command:
 
 ```bash
-python src/main.py -i benchmark
+python main.py -i benchmark
 ```
