@@ -4,6 +4,9 @@ import hashlib
 import json
 
 class BaseEvaluator(ABC):
+    @abstractmethod
+    def __init__(self, eval_config: dict):
+        ...
 
     @abstractmethod
     def evaluate(self, question, response, references, **kwargs)->tuple[bool, dict]:
