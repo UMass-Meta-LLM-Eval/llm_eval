@@ -52,7 +52,7 @@ def main():
     args = parser.parse_args()
 
     # Create the database
-    db = JSONDatabase('test_db', 'data/')
+    db = JSONDatabase('json_db', 'data/')
 
     # Run the benchmark
     if args.benchmark_config:
