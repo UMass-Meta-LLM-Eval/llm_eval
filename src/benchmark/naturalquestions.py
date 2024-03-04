@@ -101,6 +101,8 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
     def compute_results(self, model_cfg: dict, db: BaseDatabase,
                         evaluator: BaseEvaluator):
         rng = self._get_rng(self._config.get('seed', 0))
+        checked = 0
+        correct = 0
 
         # Shuffle the dataset (if sampling)
         if 'num_samples' in self._config:
@@ -123,17 +125,21 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
             key = BenchmarkDoc(self._config, model_cfg, prompt).get_hash()
             doc = self._get_doc_from_db(db, 'naturalquestions', key)
             prediction = doc.response
-            result = evaluator.evaluate(row['question']['text'], prediction,
+            result, info = evaluator.evaluate(row['question']['text'], prediction,
                                         acceptable_answers['short_answers'])
+            checked += 1
+            correct += int(result)
             eval_key = hex(evaluator.get_eval_key(key))
             doc.evaluation[eval_key] = {
                 'evaluator': evaluator.config,
-                'result': result}
+                'result': result,
+                'info': info}
             db.add_doc('benchmark', 'naturalquestions', key, doc.to_json())
             pbar.update(1)
             if pbar.n >= total:
                 break
         pbar.close()
+        return correct / checked
 
     def inspect_results(self, db: BaseDatabase, model_cfg: dict):
         rng = self._get_rng(self._config.get('seed', 0))
@@ -163,6 +169,62 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
             n += 1
             if n >= total:
                 break
+            if input() == 'q':
+                break
+
+    @property
+    def config(self):
+        return self._config
+
+
+class DummyNQBenchmark(BaseBenchmark):
+    def __init__(self, bm_config: dict):
+        self._config = bm_config
+        self._dataset = [
+            {
+                'question': 'When was the last time anyone was on the moon?',
+                'references': ['14 December 1972 UTC', 'December 1972']
+            }
+        ]
+
+    def create_prompt(self, question, **kwargs):
+        return f'Q. {question} A: '
+
+    def run(self, model, db: BaseDatabase):
+        for item in self._dataset:
+            prompt = self.create_prompt(item['question'])
+            prediction = model.predict(prompt)
+            doc = BenchmarkDoc(self._config, model.config, prompt, prediction)
+            db.add_doc('benchmark', 'nq_dummy', doc.get_hash(), doc.to_json())
+
+    def compute_results(self, model_cfg: dict, db: BaseDatabase,
+                        evaluator: BaseEvaluator):
+        scores = []
+        for item in self._dataset:
+            prompt = self.create_prompt(item['question'])
+            doc = BenchmarkDoc(self._config, model_cfg, prompt)
+            key = doc.get_hash()
+            doc = db.get_doc('benchmark', 'nq_dummy', key)
+            doc = BenchmarkDoc.from_json(doc)
+            prediction = doc.response
+            result, info = evaluator.evaluate(item['question'], prediction,
+                                        item['references'])
+            eval_key = hex(evaluator.get_eval_key(key))
+            doc.evaluation[eval_key] = {
+                'evaluator': evaluator.config,
+                'result': result,
+                'info': info}
+            db.add_doc('benchmark', 'nq_dummy', key, doc.to_json())
+            scores.append(int(result))
+
+        return sum(scores) / len(scores)
+
+    def inspect_results(self, db: BaseDatabase, model_cfg: dict):
+        for item in self._dataset:
+            prompt = self.create_prompt(item['question'])
+            key = BenchmarkDoc(self._config, model_cfg, prompt).get_hash()
+            doc = self._get_doc_from_db(db, 'nq_dummy', key)
+            doc.inspect(item['question'], item['references'])
             if input() == 'q':
                 break
 
