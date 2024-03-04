@@ -47,7 +47,7 @@ class MMLUBenchmark(BaseBenchmark):
                 prediction = model.predict(prompt, b64_output=True)
                 doc = BenchmarkDoc(self._config, model.config,
                                    row['input'], prompt, prediction)
-                db.add_doc('benchmark', 'mmlu', hash(doc), doc.to_json())
+                db.add_doc('benchmark', 'mmlu', doc.get_hash(), doc.to_json())
 
     def compute_results(self, model_cfg: dict, db: BaseDatabase,
                         evaluator: BaseEvaluator):
@@ -59,7 +59,7 @@ class MMLUBenchmark(BaseBenchmark):
                 prompt = self.create_prompt(row)
                 doc = BenchmarkDoc(self._config, model_cfg, row['input'],
                                    prompt, None)
-                key = hash(doc)
+                key = doc.get_hash()
                 doc = db.get_doc('benchmark', 'mmlu', key)
                 prediction = doc['response']
                 prediction = base64.b64decode(prediction).decode('utf-8')

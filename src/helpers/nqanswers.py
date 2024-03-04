@@ -22,16 +22,15 @@ class NQAnswersHelper:
 
     def findAcceptableAnswersforNQ(self, doc : object):   
         acceptable_answers = {}
-        short_answers, long_answers = [], []
+        short_answers, long_answers = set(), []
 
         for ans in doc["annotations"]["short_answers"]:
             if ans['text'] != []:
-                short_answers += ans['text']
+                short_answers = short_answers.union(set(ans['text']))
             elif ans["start_token"] != [] and ans["end_token"] != []: 
-                short_answers.append(self.findAnswerSpanBasedOnTokens(doc, ans["start_token"],ans["end_token"]))
+                short_answers.add(self.findAnswerSpanBasedOnTokens(doc, ans["start_token"],ans["end_token"]))
         short_answers = list(filter(None, short_answers))
-        if short_answers != []:
-            acceptable_answers['short_answers'] = short_answers
+        acceptable_answers['short_answers'] = short_answers
 
         for ans in doc["annotations"]["long_answer"]:
             if ans["start_token"] != [] and ans["end_token"] != []:
@@ -44,10 +43,3 @@ class NQAnswersHelper:
             acceptable_answers['y/n'] = doc['annotations']['yes_no_answer']
 
         return acceptable_answers
-
-# dataset = load_dataset("natural_questions", split='validation')
-# for i, row in enumerate(dataset):
-#     print(i)
-#     acceptable_answers = findAcceptableAnswersforNaturalQuestions(row)
-#     if acceptable_answers == {}:
-#         print(row['question']['text'], "\n")

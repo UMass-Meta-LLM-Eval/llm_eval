@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-
+import base64
+import hashlib
+import json
 
 class BaseEvaluator(ABC):
 
@@ -11,9 +13,14 @@ class BaseEvaluator(ABC):
         return [self.evaluate(q, r, refs, **kwargs)
                 for q, r, refs in zip(questions, responses, references_list)]
     
+    def get_eval_key(self, key):
+        self_str = json.dumps(self.config)
+        return int(hashlib.sha256(
+            (hex(key)+self_str).encode('utf-8')).hexdigest(), 16)
+    
     @property
     @abstractmethod
-    def config(self):
+    def config(self, key):
         ...
 
 

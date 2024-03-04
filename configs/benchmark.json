@@ -1,0 +1,18 @@
+{
+    "benchmarks": [
+        {
+            "name": "nq_poc-400-5shot",
+            "cls": "NaturalQuestionsBenchmark",
+            "seed": 42,
+            "num_samples": 5,
+            "num_fewshot": 5
+        }
+    ],
+    "models" : [
+        {
+            "name": "llama2-7b-chat",
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-7b-chat-hf"
+        }
+    ]
+}

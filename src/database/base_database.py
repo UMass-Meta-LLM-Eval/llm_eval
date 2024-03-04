@@ -12,6 +12,10 @@ class BaseDatabase(ABC):
     @abstractmethod
     def add_doc(self, db_name, coll_name, doc_id, doc):
         ...
+
+    def iter_collection(self, db_name, coll_name):
+        raise NotImplementedError("This database does not support "
+                                  "iterating over collections.")
     
 
 class DummyDatabase(ABC):
