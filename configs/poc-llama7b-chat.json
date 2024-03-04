@@ -4,7 +4,7 @@
             "name": "nq_poc-400-5shot",
             "cls": "NaturalQuestionsBenchmark",
             "seed": 42,
-            "num_samples": 5,
+            "num_samples": 400,
             "num_fewshot": 5
         }
     ],
