@@ -2,8 +2,7 @@
 
 from .base_benchmark import BaseBenchmark, DummyBenchmark
 from .mmlu import MMLUBenchmark
-from .naturalquestions import NaturalQuestionsBenchmark
-from .nq import DummyNQBenchmark
+from .naturalquestions import NaturalQuestionsBenchmark, DummyNQBenchmark
 
 classes = {
     'DummyBenchmark': DummyBenchmark,

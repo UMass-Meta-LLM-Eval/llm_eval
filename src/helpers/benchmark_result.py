@@ -4,8 +4,8 @@ import json
 import textwrap
 from termcolor import colored
 
+
 class BenchmarkDoc:
-    
     def __init__(self, bm_config: dict, model_config: dict,
                  prompt: str, response: str = None, evaluation: dict = None):
         self.bm_config = bm_config
@@ -67,9 +67,9 @@ class BenchmarkDoc:
         print(textwrap.indent(colored(self.response, 'green'), '  '))
         print(f'{colored("Evaluations", "red")}:')
         for eval in self.evaluation.values():
-            e, i = eval['result']
-            print(f'  {eval["evaluator"]["name"]}: {e}')
-            if i != {}:
-                print(f'    {i}')
+            print(textwrap.indent(
+                f'{eval["evaluator"]["name"]}: {eval["result"]}', '  '))
+            if eval['info'] != {}:
+                eval_info = json.dumps(eval['info'])
+                print(textwrap.indent(eval_info, '    '))
         print()
-    
