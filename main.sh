@@ -17,10 +17,10 @@
 module load miniconda/22.11.1-1
 module load gcc/11.2.0
 module load cuda/12.2.1
-conda activate /work/pi_dhruveshpate_umass_edu/grp22/users/kartikchoudh/conda/envs/kc-llm-eval/
+conda activate /work/pi_dhruveshpate_umass_edu/grp22/users/<<username>>/conda/envs/<<env-name>>/
 
 # Change to the project directory
-cd /work/pi_dhruveshpate_umass_edu/grp22/users/kartikchoudh/projects/llm_eval/
+cd /work/pi_dhruveshpate_umass_edu/grp22/users/<<username>>/projects/llm_eval/
 
 # Run the script
 echo "Running main.py"
