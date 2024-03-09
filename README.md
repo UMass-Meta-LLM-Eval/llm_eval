@@ -87,3 +87,27 @@ the following command:
 ```bash
 sbatch main.sh -b benchmark
 ```
+##Setting up MongoDB Atlas
+
+To connect to the MongoDB Atlas cluster:
+
+1. Download the server CA certificate from https://letsencrypt.org/certs/isrgrootx1.pem and place it in the root directory of the project.
+
+2. Download the driver for MongoDB Atlas
+```bash
+python -m pip install "pymongo[srv]"==3.6
+```
+
+3. Place the MongoDB URI in the .env file as 
+
+'MONGO_URI="mongodb+srv://<username>:<password>@<cluster_url>/?retryWrites=true&w=majority&appName=<cluster_name>&tlsCAFile=isrgrootx1.pem"
+
+Note: Make sure to grant database user access to the users for shared access to the respective cluster.
+
+4. Grant Network Access to the IP address of the client for your cluster. Grant access to '0.0.0.0' if you are running it on Unity. 
+
+5. In the root directory, run the following command to test if the client is able to establish connection with the server
+
+```bash
+python -m src.database.mongodb_test
+```
