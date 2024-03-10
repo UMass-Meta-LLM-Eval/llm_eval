@@ -7,6 +7,7 @@ from .base_model import BaseModel
 class LlamaModel(BaseModel):
     def __init__(self, model_config: dict):
         self._config = model_config
+        self.MAX_NEW_TOKENS = model_config['max_new_tokens'] if 'max_new_tokens' in model_config else 32 
         self.tokenizer = AutoTokenizer.from_pretrained(
             self._config['model'], token=os.getenv('HF_TOKEN'))
 
@@ -22,7 +23,7 @@ class LlamaModel(BaseModel):
             top_k=10,
             num_return_sequences=1,
             eos_token_id=self.tokenizer.eos_token_id,
-            max_new_tokens=32)
+            max_new_tokens=self.MAX_NEW_TOKENS)
         response = sequences[0]['generated_text']
         if response.startswith(prompt):
             response = response[len(prompt):]
