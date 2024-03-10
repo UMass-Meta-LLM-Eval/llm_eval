@@ -1,5 +1,6 @@
 from datasets import load_dataset
-from numpy.random import Generator, PCG64
+
+from src.helpers.utils import Utilities
 
 from .base_benchmark import BaseBenchmark
 from ..helpers import BenchmarkDoc, NQAnswersHelper
@@ -14,13 +15,15 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
     def __init__(self, bm_config: dict):
         self._config = bm_config
         self.nqhelper = NQAnswersHelper()
+        self.utils = Utilities()
         self._dataset = load_dataset('natural_questions',
                                      trust_remote_code=True)
         self._fewshot_prefix = self._create_fewshot_examples(
             self._config.get('num_fewshot', 0))
+        
 
     def _create_fewshot_examples(self, num_fewshot: int):
-        rng = self._get_rng(self._config.get('seed', 0))
+        rng = self.utils._get_rng(self._config.get('seed', 0))
 
         if num_fewshot > 0:
             fewshot_idxs = rng.choice(
@@ -64,11 +67,8 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
 
         return prompt
 
-    def _get_rng(self, seed: int):
-        return Generator(PCG64(seed=seed))
-
     def run(self, model, db: BaseDatabase):
-        rng = self._get_rng(self._config.get('seed', 0))
+        rng = self.utils._get_rng(self._config.get('seed', 0))
 
         # Shuffle the dataset (if sampling)
         if 'num_samples' in self._config:
@@ -100,7 +100,7 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
 
     def compute_results(self, model_cfg: dict, db: BaseDatabase,
                         evaluator: BaseEvaluator):
-        rng = self._get_rng(self._config.get('seed', 0))
+        rng = self.utils._get_rng(self._config.get('seed', 0))
         checked = 0
         correct = 0
 
@@ -134,7 +134,7 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
                 'evaluator': evaluator.config,
                 'result': result,
                 'info': info}
-            db.add_doc('benchmark', 'naturalquestions', key, doc.to_json())
+            db.add_doc('evaluation', 'naturalquestions', key, doc.to_json())
             pbar.update(1)
             if pbar.n >= total:
                 break
@@ -142,7 +142,7 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
         return correct / checked
 
     def inspect_results(self, db: BaseDatabase, model_cfg: dict):
-        rng = self._get_rng(self._config.get('seed', 0))
+        rng = self.utils._get_rng(self._config.get('seed', 0))
 
         # Shuffle the dataset (if sampling)
         if 'num_samples' in self._config:

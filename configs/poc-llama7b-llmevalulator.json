@@ -1,0 +1,36 @@
+{
+    "evaluators": [
+        {
+            "name": "llm-llama2-7b",
+            "cls": "LLMEvaluator",
+            "seed": 42,
+            "num_fewshot": 1,
+            "max_new_tokens": 1,
+            "model": {
+                "name": "llama2-7b-base",
+                "cls": "LlamaModel",
+                "model": "meta-llama/Llama-2-7b-chat-hf"
+            }
+        }
+    ],
+    "benchmarks": [
+        {
+            "name": "nq_poc-400-5shot",
+            "cls": "NaturalQuestionsBenchmark",
+            "seed": 42,
+            "num_samples": 400,
+            "num_fewshot": 5
+        }
+    ],
+    "models": [
+        {
+            "name": "llama2-7b-base",
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-7b-hf"
+        }
+    ],
+    "db": {
+        "uri": "MONGODBURI1",
+        "env": "test"
+    }
+}

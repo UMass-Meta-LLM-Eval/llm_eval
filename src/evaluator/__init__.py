@@ -2,6 +2,7 @@ from .base_evaluator import BaseEvaluator, DummyEvaluator
 from .classic_evaluator import (ExactMatchEvaluator, ContainsMatchEvaluator,
                                 ContainsWordsEvaluator)
 from .human_evaluator import HumanEvaluator
+from .llm_evaluator import LLMEvaluator
 
 classes = {
     'DummyEvaluator': DummyEvaluator,
@@ -9,6 +10,7 @@ classes = {
     'ContainsMatchEvaluator': ContainsMatchEvaluator,
     'ContainsWordsEvaluator': ContainsWordsEvaluator,
     'HumanEvaluator': HumanEvaluator,
+    'LLMEvaluator': LLMEvaluator
     # Add new evaluators here
 }
 

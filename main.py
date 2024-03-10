@@ -40,6 +40,10 @@ def inspect(db: BaseDatabase, config: dict):
         benchmark = create_benchmark(bm_cfg)
         benchmark.inspect_results(db, model_cfg)
 
+def init_db(config: dict):
+    if 'db' not in config:
+        return JSONDatabase('json_db', 'data/')
+    return MongoDB(config['db']['env'], config['db']['uri'])
 
 def main():
     parser = ArgumentParser(description='Driver script for running jobs')
@@ -52,25 +56,41 @@ def main():
     args = parser.parse_args()
 
     # Create the database
-    db = JSONDatabase('json_db', 'data/')
-
+    valid_config = args.benchmark_config if args.benchmark_config else args.eval_config if args.eval_config else args.inspect_config
+    if valid_config:
+        with open(f'configs/{valid_config}.json') as f:
+            db_config = json.load(f)
+            db = init_db(db_config)
+        print('DB Init Complete')
+    else:
+        raise ValueError('No Valid Config Provided')
+        
     # Run the benchmark
     if args.benchmark_config:
         with open(f'configs/{args.benchmark_config}.json') as f:
             bm_config = json.load(f)
         benchmark(db, bm_config)
+        print('Benchmarking Complete')
+    else:
+        print('Benchmarking Skipped')
 
     # Evaluate the results
     if args.eval_config:
         with open(f'configs/{args.eval_config}.json') as f:
             eval_config = json.load(f)
         evaluate(db, eval_config)
+        print('Evaluation Complete')
+    else:
+        print('Evaluation Skipped')
 
     # Inspect the results
     if args.inspect_config:
         with open(f'configs/{args.inspect_config}.json') as f:
             inspect_config = json.load(f)
         inspect(db, inspect_config)
+        print('Inspect Complete')
+    else:
+        print('Inspect Skipped')
 
 
 if __name__ == '__main__':

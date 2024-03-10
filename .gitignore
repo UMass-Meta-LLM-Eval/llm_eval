@@ -2,5 +2,7 @@
 .ipynb_checkpoints/
 *.pyc
 __pycache__/
-*.log
+*.err
+*.out
 MongoDB/*
+data/*
