@@ -26,11 +26,14 @@ class JSONDatabase(BaseDatabase):
 
     def get_doc(self, db_name, coll_name, doc_id):
         data = self._load_data(f'{db_name}/{coll_name}.json')
-        return data[hex(doc_id)]
+        return data[doc_id]
     
     def add_doc(self, db_name, coll_name, doc_id, doc):
         data = self._load_data(f'{db_name}/{coll_name}.json')
 
-        data[hex(doc_id)] = doc
+        data[doc_id] = doc
         self._save_data(f'{db_name}/{coll_name}.json', data)
-    
+
+    def doc_exists(self, db_name, coll_name, doc_id) -> bool:
+        data = self._load_data(f'{db_name}/{coll_name}.json')
+        return doc_id in data

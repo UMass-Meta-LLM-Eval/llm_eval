@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-import base64
 import hashlib
 import json
+
+from ..helpers import InfoDoc
 
 class BaseEvaluator(ABC):
     @abstractmethod
@@ -16,20 +17,22 @@ class BaseEvaluator(ABC):
         return [self.evaluate(q, r, refs, **kwargs)
                 for q, r, refs in zip(questions, responses, references_list)]
     
-    def get_eval_key(self, key):
-        self_str = json.dumps(self.config)
-        return int(hashlib.sha256(
-            (hex(key)+self_str).encode('utf-8')).hexdigest(), 16)
-    
     @property
     @abstractmethod
     def config(self, key):
         ...
 
+    @property
+    @abstractmethod
+    def hashval(self) -> str:
+        """Return the SHA256 hash of the evaluator's configuration as a base64
+        string."""
+
 
 class DummyEvaluator(BaseEvaluator):
     def __init__(self, eval_config: dict):
         self._eval_config = eval_config
+        self._doc = InfoDoc(**eval_config)
 
     def evaluate(self, question, response, references, **kwargs):
         return True, {}
@@ -37,3 +40,7 @@ class DummyEvaluator(BaseEvaluator):
     @property
     def config(self):
         return self._eval_config
+    
+    @property
+    def hashval(self):
+        return self._doc.doc_id

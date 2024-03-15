@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-import base64
 
 from ..helpers import BenchmarkDoc
+from ..helpers.constants.db import BENCHMARK
 from ..database import BaseDatabase
 from ..evaluator import BaseEvaluator
 
@@ -35,7 +35,7 @@ class BaseBenchmark(ABC):
         stored in the given database."""
         ...
 
-    def inspect_results(self, db: BaseDatabase, model_cfg: dict) -> None:
+    def inspect_results(self, db: BaseDatabase, model_hash: str) -> None:
         """Inspect the results of the benchmark stored in the given database.
         """
         raise NotImplementedError("This benchmark does not support inspecting "
@@ -47,8 +47,16 @@ class BaseBenchmark(ABC):
         """Return the benchmark's configuration."""
         ...
 
-    def _get_doc_from_db(self, db, bm_name, key):
-        doc = db.get_doc('benchmark', bm_name, key)
+    @property
+    @abstractmethod
+    def hashval(self) -> str:
+        """Return the SHA256 hash of the benchmark's configuration as a base64
+        string."""
+        ...
+
+    def _get_doc_from_db(self, db: BaseDatabase, bm_name, key):
+        print(f'Getting doc from db: {BENCHMARK}/{bm_name} with key: {key}')
+        doc = db.get_doc(BENCHMARK, bm_name, key)
         return BenchmarkDoc.from_json(doc)
 
 
@@ -72,12 +80,12 @@ class DummyBenchmark(BaseBenchmark):
                                prompt, prediction)
             db.add_doc('benchmark', 'test', doc.get_hash(), doc.to_json())
 
-    def compute_results(self, model_cfg: dict, db: BaseDatabase,
+    def compute_results(self, model_hash: str, db: BaseDatabase,
                         evaluator: BaseEvaluator):
         scores = []
         for item in self._dataset:
             prompt = self.create_prompt(item['question'])
-            doc = BenchmarkDoc(self._config, model_cfg, prompt)
+            doc = BenchmarkDoc(self._config, model_hash, prompt)
             key = doc.get_hash()
             doc = db.get_doc('benchmark', 'test', key)
             prediction = doc['response']

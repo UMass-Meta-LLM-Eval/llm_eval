@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from itertools import product
 import json
+import os
 import sys
 from dotenv import load_dotenv
 loaded = load_dotenv()
@@ -10,8 +11,9 @@ if not loaded:
 
 from src.benchmark import create_benchmark
 from src.database import BaseDatabase, JSONDatabase, MongoDB
-from src.model import create_model
 from src.evaluator import create_evaluator
+from src.helpers import InfoDoc
+from src.model import create_model
 
 
 def benchmark(db: BaseDatabase, config: dict):
@@ -31,14 +33,16 @@ def evaluate(db: BaseDatabase, config: dict):
         for (bm_cfg, model_cfg) in product(config['benchmarks'],
                                            config['models']):
             benchmark = create_benchmark(bm_cfg)
-            results = benchmark.compute_results(model_cfg, db, evaluator)
+            model_hash = InfoDoc(**model_cfg).doc_id
+            results = benchmark.compute_results(model_hash, db, evaluator)
             print(results)
 
 
 def inspect(db: BaseDatabase, config: dict):
     for (bm_cfg, model_cfg) in product(config['benchmarks'], config['models']):
         benchmark = create_benchmark(bm_cfg)
-        benchmark.inspect_results(db, model_cfg)
+        model_hash = InfoDoc(**model_cfg).doc_id
+        benchmark.inspect_results(db, model_hash)
 
 
 def main():
@@ -52,7 +56,8 @@ def main():
     args = parser.parse_args()
 
     # Create the database
-    db = JSONDatabase('json_db', 'data/')
+    # db = JSONDatabase('json_db', 'data/')
+    db = MongoDB({'uri': os.getenv('MONGODB_URI')})
 
     # Run the benchmark
     if args.benchmark_config:

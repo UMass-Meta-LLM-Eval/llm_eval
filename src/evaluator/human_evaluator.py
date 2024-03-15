@@ -2,13 +2,14 @@ import textwrap
 from termcolor import colored
 
 from .base_evaluator import BaseEvaluator
-from ..database import BaseDatabase
 from .classic_evaluator import ExactMatchEvaluator
+from ..helpers import InfoDoc
 
 class HumanEvaluator(BaseEvaluator):
     def __init__(self, eval_config: dict):
         self._eval_config = eval_config
         self._exact_match_evaluator = ExactMatchEvaluator({})
+        self._doc = InfoDoc(**eval_config)
 
     def evaluate(self, question, response, references, **kwargs):
         # If the response is an exact match, return True
@@ -44,3 +45,7 @@ class HumanEvaluator(BaseEvaluator):
     @property
     def config(self):
         return self._eval_config
+    
+    @property
+    def hashval(self):
+        return self._doc.doc_id

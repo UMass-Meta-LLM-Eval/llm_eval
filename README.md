@@ -111,3 +111,80 @@ Note: Make sure to grant database user access to the users for shared access to 
 ```bash
 python -m src.database.mongodb_test
 ```
+
+# Available Implementations
+
+## Models
+
+1. Llama
+    
+    `cls` = "LlamaModel"
+    * `chat` (`bool`): If using the chat model (default: `False`)
+
+2. OpenAI
+
+    `cls` = "OpenAIModel"
+    
+
+3. Anthropic
+
+    `cls` = "AnthropicModel"
+    * `chat` (`bool`): If using the chat model (default: `False`)
+
+4. HumanModel
+    
+    `cls` = "HumanModel"
+    
+    Makes queries to the human using CLI. For testing purposes.
+
+5. DummyModel
+    
+    `cls` = "DummyModel"
+    
+    Returns the prompt with a fixed prefix. For automated testing purposes.
+
+    * `prefix` (`str`): The fixed prefix to return (default: `""`)
+
+
+## Benchmarks
+
+1. Natural Questions
+
+    `cls` = "NaturalQuestionsBenchmark"
+    * `num_samples` (`int`): The number of samples (questions) to use (default: `None`)
+    * `num_fewshot` (`int`): The number of few-shot examples to use (default: 0)
+    * `seed` (`int`): The random seed to use for shuffling the dataset (default: `None`)
+
+2. TriviaQA
+
+    `cls` = TBD
+
+3. MMLU
+
+    `cls` = "MMLUBenchmark"
+    
+4. DummyNQ
+
+    `cls` = "DummyNQBenchmark"
+    
+    Natural Questions benchmark with only 1 sample for testing purposes.
+
+
+## Evaluators
+
+1. Exact Match
+
+    `cls` = "ExactMatchEvaluator"
+    * `cased` (`bool`): If the evaluation should be case-sensitive (default: `True`)
+
+2. Contains
+
+    `cls` = "ContainsMatchEvaluator"
+    * `cased` (`bool`): If the evaluation should be case-sensitive (default: `True`)
+
+3. HumanEvaluator
+
+    `cls` = "HumanEvaluator"
+    
+    Makes queries to the human using CLI. Human must answer with `y`, `n`, `yy`,
+    or `nn` for each prompt.

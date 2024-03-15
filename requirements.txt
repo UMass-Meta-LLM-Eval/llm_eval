@@ -5,3 +5,6 @@ accelerate
 datasets
 pymongo
 termcolor
+evaluate
+openai
+anthropic

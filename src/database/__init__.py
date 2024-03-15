@@ -1,3 +1,3 @@
-from .base_database import BaseDatabase
+from .base_database import BaseDatabase, DummyDatabase
 from .json_database import JSONDatabase
-from .mongodb import MongoDB, DummyMongoDB
+from .mongodb import MongoDB

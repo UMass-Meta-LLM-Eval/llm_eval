@@ -1,5 +1,6 @@
 import base64
 from abc import ABC, abstractmethod
+from ..helpers import InfoDoc
 
 class BaseModel(ABC):
     @abstractmethod
@@ -24,13 +25,19 @@ class BaseModel(ABC):
     @abstractmethod
     def config(self) -> dict:
         """Return the model's configuration."""
-        ...
+
+    @property
+    @abstractmethod
+    def hashval(self) -> str:
+        """Return the SHA256 hash of the model's configuration as a base64
+        string."""
 
 
 class DummyModel(BaseModel):
     def __init__(self, model_config: dict):
         self._config = model_config
         self.prefix = model_config['prefix']
+        self._doc = InfoDoc(**model_config)
 
     def _predict(self, prompt: str) -> str:
         return self.prefix + prompt
@@ -38,3 +45,7 @@ class DummyModel(BaseModel):
     @property
     def config(self) -> dict:
         return self._config
+
+    @property
+    def hashval(self):
+        return self._doc.doc_id

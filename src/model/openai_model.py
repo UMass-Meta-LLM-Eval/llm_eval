@@ -1,6 +1,7 @@
 import os
 from openai import OpenAI
 from .base_model import BaseModel
+from ..helpers.documents import InfoDoc
 
 
 class OpenAIModel(BaseModel):
@@ -10,6 +11,7 @@ class OpenAIModel(BaseModel):
         self.client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'),
                              **client_kwargs)
         self._completions_kwargs = self._config.get('completions_kwargs', {})
+        self._doc = InfoDoc(**model_config)
 
     def _predict(self, prompt: str) -> str:
         messages = [{'role': 'user', 'content': prompt}]
@@ -22,3 +24,7 @@ class OpenAIModel(BaseModel):
     @property
     def config(self) -> dict:
         return self._config
+
+    @property
+    def hashval(self):
+        return self._doc.doc_id

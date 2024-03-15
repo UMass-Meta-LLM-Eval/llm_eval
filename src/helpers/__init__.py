@@ -1,2 +1,2 @@
-from .benchmark_result import BenchmarkDoc
+from .documents import BenchmarkDoc, InfoDoc
 from .nqanswers import NQAnswersHelper

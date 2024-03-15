@@ -6,11 +6,15 @@ class BaseDatabase(ABC):
         ...
 
     @abstractmethod
-    def get_doc(self, db_name, coll_name, doc_id):
+    def get_doc(self, db_name: str, coll_name: str, doc_id):
         ...
 
     @abstractmethod
-    def add_doc(self, db_name, coll_name, doc_id, doc):
+    def add_doc(self, db_name: str, coll_name: str, doc_id, doc):
+        ...
+
+    @abstractmethod
+    def doc_exists(self, db_name: str, coll_name: str, doc_id) -> bool:
         ...
 
     def iter_collection(self, db_name, coll_name):
@@ -28,3 +32,6 @@ class DummyDatabase(ABC):
     
     def add_doc(self, db_name, coll_name, doc_id, doc):
         pass
+
+    def doc_exists(self, db_name, coll_name, doc_id) -> bool:
+        return True

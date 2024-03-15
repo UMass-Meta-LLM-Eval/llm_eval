@@ -1,8 +1,10 @@
 from .base_evaluator import BaseEvaluator
+from ..helpers import InfoDoc
 
 class ExactMatchEvaluator(BaseEvaluator):
     def __init__(self, eval_config: dict):
         self._eval_config = eval_config
+        self._doc = InfoDoc(**eval_config)
 
     def evaluate(self, question, response, references, **kwargs):
         cased = self.config.get('cased', True)
@@ -14,10 +16,15 @@ class ExactMatchEvaluator(BaseEvaluator):
     @property
     def config(self):
         return self._eval_config
+    
+    @property
+    def hashval(self):
+        return self._doc.doc_id
 
 class ContainsMatchEvaluator(BaseEvaluator):
     def __init__(self, eval_config: dict):
         self._eval_config = eval_config
+        self._doc = InfoDoc(**eval_config)
 
     def evaluate(self, question, response, references, **kwargs):
         cased = self.config.get('cased', True)
@@ -30,9 +37,14 @@ class ContainsMatchEvaluator(BaseEvaluator):
     def config(self):
         return self._eval_config
     
+    @property
+    def hashval(self):
+        return self._doc.doc_id
+    
 class ContainsWordsEvaluator(BaseEvaluator):
     def __init__(self, eval_config: dict):
         self._eval_config = eval_config
+        self._doc = InfoDoc(**eval_config)
 
     def evaluate(self, question, response, references, **kwargs):
         cased = self.config.get('cased', True)
@@ -50,3 +62,7 @@ class ContainsWordsEvaluator(BaseEvaluator):
     @property
     def config(self):
         return self._eval_config
+    
+    @property
+    def hashval(self):
+        return self._doc.doc_id
