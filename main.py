@@ -44,6 +44,10 @@ def inspect(db: BaseDatabase, config: dict):
         model_hash = InfoDoc(**model_cfg).doc_id
         benchmark.inspect_results(db, model_hash)
 
+def init_db(config: dict):
+    if 'db' not in config:
+        return JSONDatabase('json_db', 'data/')
+    return MongoDB(config['db']['env'], config['db']['uri'])
 
 def main():
     parser = ArgumentParser(description='Driver script for running jobs')
@@ -64,18 +68,27 @@ def main():
         with open(f'configs/{args.benchmark_config}.json') as f:
             bm_config = json.load(f)
         benchmark(db, bm_config)
+        print('Benchmarking Complete')
+    else:
+        print('Benchmarking Skipped')
 
     # Evaluate the results
     if args.eval_config:
         with open(f'configs/{args.eval_config}.json') as f:
             eval_config = json.load(f)
         evaluate(db, eval_config)
+        print('Evaluation Complete')
+    else:
+        print('Evaluation Skipped')
 
     # Inspect the results
     if args.inspect_config:
         with open(f'configs/{args.inspect_config}.json') as f:
             inspect_config = json.load(f)
         inspect(db, inspect_config)
+        print('Inspect Complete')
+    else:
+        print('Inspect Skipped')
 
 
 if __name__ == '__main__':

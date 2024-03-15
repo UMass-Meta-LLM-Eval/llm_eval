@@ -1,5 +1,6 @@
 from datasets import load_dataset
-from numpy.random import Generator, PCG64
+
+from src.helpers.utils import Utilities
 
 from .base_benchmark import BaseBenchmark
 from ..database import BaseDatabase
@@ -18,6 +19,7 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
     def __init__(self, bm_config: dict):
         self._config = bm_config
         self.nqhelper = NQAnswersHelper()
+        self.utils = Utilities()
         self._dataset = load_dataset('natural_questions',
                                      trust_remote_code=True)
         self._fewshot_prefix = self._create_fewshot_examples(
@@ -26,7 +28,7 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
         self._use_cache = self._config.get('use_cache', True)
 
     def _create_fewshot_examples(self, num_fewshot: int):
-        rng = self._get_rng(self._config.get('seed', 0))
+        rng = self.utils._get_rng(self._config.get('seed', 0))
 
         if num_fewshot > 0:
             fewshot_idxs = rng.choice(
@@ -139,6 +141,7 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
                 break
 
         pbar.close()
+
 
     def compute_results(self, model_hash: str, db: BaseDatabase,
                         evaluator: BaseEvaluator) -> float:

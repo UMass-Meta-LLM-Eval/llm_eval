@@ -58,3 +58,4 @@ class LLMEvaluator(BaseEvaluator):
     @property
     def hashval(self):
         return self._doc.doc_id
+
