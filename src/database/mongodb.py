@@ -18,6 +18,11 @@ class MongoDB(BaseDatabase):
     def add_doc(self, db_name: str, coll_name: str, doc_id, doc):
         collection = self.client[db_name][coll_name]
         collection.update_one({'_id': doc_id}, {'$set': doc}, upsert=True)
+    
+    def update_doc(self, db_name: str, coll_name: str, doc_id, key, val):
+        collection = self.client[db_name][coll_name]
+        collection.find_one_and_update({'_id':doc_id},
+                        { '$set': {key : val} })
 
     def doc_exists(self, db_name: str, coll_name: str, doc_id) -> bool:
         collection = self.client[db_name][coll_name]

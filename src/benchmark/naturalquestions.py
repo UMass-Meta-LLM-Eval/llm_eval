@@ -183,10 +183,7 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
                 result, info = evaluator.evaluate(
                     row['question']['text'], prediction,
                     acceptable_answers['short_answers'])
-                
-                doc.evaluation[evaluator.hashval] = {'result': result,
-                                                     'info': info}
-                db.add_doc(BENCHMARK, self.BM_NAME, key, doc.to_json())
+                db.update_doc(BENCHMARK, self.BM_NAME, key, evaluator.hashval, {'result': result, 'info': info})
             
             # Update the statistics and progress bar
             checked += 1
