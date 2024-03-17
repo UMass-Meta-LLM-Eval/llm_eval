@@ -14,6 +14,10 @@ class BaseDatabase(ABC):
         ...
 
     @abstractmethod
+    def update_doc(self, db_name: str, coll_name: str, doc_id, key, val):
+        ...
+
+    @abstractmethod
     def doc_exists(self, db_name: str, coll_name: str, doc_id) -> bool:
         ...
 
