@@ -2,17 +2,26 @@ import os
 import torch
 from transformers import pipeline, AutoTokenizer
 
-from .base_model import BaseModel
-from ..helpers.documents import InfoDoc
+from ..base_model import BaseModel
+from ...helpers.documents import InfoDoc
 
-class LlamaModel(BaseModel):
+class BaseHFModel(BaseModel):
+    """Base class for all HuggingFace models."""
+
+    HF_ORG_NAME = ''
+    """Name of the organization that provides the model."""
+
     def __init__(self, model_config: dict):
         self._config = model_config
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            self._config['model'], token=os.getenv('HF_TOKEN'))
 
+        model_name = self._config['model']
+        if '/' not in model_name:
+            model_name = f'{self.HF_ORG_NAME}/{model_name}'
+
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_name, token=os.getenv('HF_TOKEN'))
         self.pipeline = pipeline('text-generation',
-                                  model=self._config['model'],
+                                  model=model_name,
                                   tokenizer=self.tokenizer,
                                   torch_dtype=torch.float16,
                                   device_map='auto',
@@ -21,12 +30,10 @@ class LlamaModel(BaseModel):
         self._doc = InfoDoc(**model_config)
 
     def _predict(self, prompt: str) -> str:
-        if self._config.get('chat', False):
-            prompt = f'[INST]{prompt}[/INST]'
         sequences = self.pipeline(
             prompt,
             eos_token_id=self.tokenizer.eos_token_id,
-            max_new_tokens=32)
+            max_new_tokens=self._config.get('max_new_tokens', 32))
         response = sequences[0]['generated_text']
         if response.startswith(prompt):
             response = response[len(prompt):]
