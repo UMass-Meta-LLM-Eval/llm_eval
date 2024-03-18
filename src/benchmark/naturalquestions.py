@@ -98,7 +98,7 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
         total, shuffled_indices = self._get_shuffled_indices(rng)
 
         num_fewshot = self._config.get('num_fewshot', 0)
-        pbar = tqdm(total=total)
+        pbar = tqdm(total=len(self._dataset['validation']))
         found_samples = 0
         for i in shuffled_indices:
             # Create the prompt and find acceptable answers
