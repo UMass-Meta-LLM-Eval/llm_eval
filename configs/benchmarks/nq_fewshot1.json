@@ -1,0 +1,42 @@
+{
+    "benchmarks": [
+        {
+            "name": "nq_fewshot1",
+            "cls": "NaturalQuestionsBenchmark",
+            "seed": 42,
+            "num_fewshot": 1
+        }
+    ],
+    "models": [
+        {
+            "name": "llama2-7b",
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-7b-hf"
+        },
+        {
+            "name": "llama2-7b-chat",
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-7b-chat-hf"
+        },
+        {
+            "name": "llama2-13b",
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-13b-hf"
+        },
+        {
+            "name": "llama2-13b-chat",
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-13b-chat-hf"
+        },
+        {
+            "name": "llama2-70b",
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-70b-hf"
+        },
+        {
+            "name": "llama2-70b-chat",
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-70b-chat-hf"
+        }
+    ]
+}
