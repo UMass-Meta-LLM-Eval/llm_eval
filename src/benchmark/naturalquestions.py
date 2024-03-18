@@ -111,9 +111,6 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
             if len(acceptable_answers['short_answers']) == 0:
                 pbar.update(1)
                 continue
-            
-            #Sort Acceptable Answer to make sure we get unique question_doc_id
-            acceptable_answers['short_answers'].sort()
 
             # Store the question in the database (if it doesn't exist already)
             question_doc = InfoDoc(

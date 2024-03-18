@@ -30,6 +30,7 @@ class NQAnswersHelper:
             elif ans["start_token"] != [] and ans["end_token"] != []: 
                 short_answers.add(self.findAnswerSpanBasedOnTokens(doc, ans["start_token"],ans["end_token"]))
         short_answers = list(filter(None, short_answers))
+        short_answers.sort()
         acceptable_answers['short_answers'] = short_answers
 
         for ans in doc["annotations"]["long_answer"]:
