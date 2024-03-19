@@ -1,0 +1,19 @@
+{
+  "benchmarks": [
+      {
+          "name": "triviaQA-llama7b",
+          "cls": "TriviaQABenchmark",
+          "subset": "unfiltered", 
+          "seed": 10,
+          "num_samples": 400,
+          "num_fewshot": 5
+      }
+  ],
+  "models" : [
+      {
+          "name": "llama2-7b-base",
+          "cls": "LlamaModel",
+          "model": "meta-llama/Llama-2-7b-hf"
+      }
+  ]
+}

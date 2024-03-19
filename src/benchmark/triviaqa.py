@@ -45,7 +45,6 @@ class TriviaQABenchmark(BaseBenchmark):
 
             row = self.training_data[idx]
             answer = row['answer']['value']
-            print(answer)
             if answer:
                 fewshot_examples.append((row['question'], answer))
                 if len(fewshot_examples) == num_fewshot:
@@ -127,6 +126,8 @@ class TriviaQABenchmark(BaseBenchmark):
             db.add_doc(BENCHMARK, self.BM_NAME, doc.doc_id,
                        doc.to_json())
             pbar.update(1)
+            if pbar.n >= total:
+                break
         pbar.close()
 
     def compute_results(self, model_hash: str, db: BaseDatabase,
@@ -174,6 +175,8 @@ class TriviaQABenchmark(BaseBenchmark):
             checked += 1
             correct += int(result)
             pbar.update(1)
+            if pbar.n >= total:
+                break
 
         pbar.close()
         return correct / checked
