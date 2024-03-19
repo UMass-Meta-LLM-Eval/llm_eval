@@ -98,9 +98,9 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
         total, shuffled_indices = self._get_shuffled_indices(rng)
 
         num_fewshot = self._config.get('num_fewshot', 0)
-        pbar = tqdm(total=total)
+        pbar = tqdm(total=len(self._dataset['validation']))
+        found_samples = 0
         for i in shuffled_indices:
-
             # Create the prompt and find acceptable answers
             row = self._dataset['validation'][i]
             prompt = self.create_prompt(row['question']['text'],
@@ -109,6 +109,7 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
 
             # Skip if no acceptable answers are found
             if len(acceptable_answers['short_answers']) == 0:
+                pbar.update(1)
                 continue
 
             # Store the question in the database (if it doesn't exist already)
@@ -125,6 +126,7 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
             if self._use_cache and db.doc_exists(BENCHMARK,
                                                  self.BM_NAME,
                                                  doc.doc_id):
+                pbar.update(1)
                 continue
 
             # Make model prediction and store in the database
@@ -135,7 +137,8 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
 
             # Next iteration
             pbar.update(1)
-            if pbar.n >= total:
+            found_samples += 1
+            if found_samples >= total:
                 break
 
         pbar.close()
