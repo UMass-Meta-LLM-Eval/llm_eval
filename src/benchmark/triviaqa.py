@@ -25,7 +25,6 @@ class TriviaQABenchmark(BaseBenchmark):
         self._use_cache = self._config.get('use_cache', True)
         self.triviaQAhelper = TriviaQaAnswersHelper()
         
-
     def _create_fewshot_examples(self, num_fewshot: int):
         rng = self._get_rng(self._config.get('seed', 0))
         fewshot_examples = []
@@ -100,7 +99,7 @@ class TriviaQABenchmark(BaseBenchmark):
         pbar = tqdm(total=total, desc='Evaluating TriviaQA')
 
         for i in shuffled_indices:
-            row = self.training_data[i]
+            row = self.dataset[i]
             question_text = row['question']
             prompt = self.create_prompt(question_text)
             acceptable_answers = self.triviaQAhelper.findAcceptableAnswersforTriviaQA(row)
@@ -165,7 +164,7 @@ class TriviaQABenchmark(BaseBenchmark):
             # Otherwise, evaluate the prediction and store the result
             else:
                 result, info = evaluator.evaluate(
-                    row['question']['text'], prediction,
+                    question_text, prediction,
                     acceptable_answers)
                 
                 doc.evaluation[evaluator.hashval] = {'result': result,
