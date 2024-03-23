@@ -176,7 +176,11 @@ python -m src.database.mongodb_test
 
 2. TriviaQA
 
-    `cls` = TBD
+    `cls` = "TriviaQABenchmark"
+    * `num_samples` (`int`): The number of samples (questions) to use (default: `None`)
+    * `num_fewshot` (`int`): The number of few-shot examples to use (default: 0)
+    * `seed` (`int`): The random seed to use for shuffling the dataset (default: `None`)
+    * `subset`: (`str`:"unfiltered"/"rc") : The subset of TriviaQA to use for benchamrking
 
 3. MMLU
 
