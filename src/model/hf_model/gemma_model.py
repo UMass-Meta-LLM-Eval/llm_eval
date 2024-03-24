@@ -6,6 +6,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from ...helpers.documents import InfoDoc
 
 class GemmaModel(BaseHFModel):
+    HF_ORG_NAME = 'google'
 
     def __init__(self, model_config: dict):
         self._config = model_config
@@ -29,7 +30,7 @@ class GemmaModel(BaseHFModel):
                                            max_new_tokens=self._config.get('max_new_tokens', 32))
         response = self.tokenizer.decode(sequences[0])
         
-        if response.startswith(response):
+        if response.startswith(self.bos):
             response = response[len(self.bos):]
 
         if response.startswith(prompt):
