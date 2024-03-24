@@ -55,7 +55,6 @@ class BaseBenchmark(ABC):
         ...
 
     def _get_doc_from_db(self, db: BaseDatabase, bm_name, key):
-        print(f'Getting doc from db: {BENCHMARK}/{bm_name} with key: {key}')
         doc = db.get_doc(BENCHMARK, bm_name, key)
         return BenchmarkDoc.from_json(doc)
 

@@ -130,15 +130,21 @@ python -m src.database.mongodb_test
 
     All the supported models are listed below:
 
-    | **Model**       | **FalconModel**    | **GemmaModel** | **LlamaModel**      | **MistralModel**           | **OlmoModel**    | **Phi2Model** | **VicunaModel** | **ZephyrModel**      |
-    |-----------------|--------------------|----------------|---------------------|----------------------------|------------------|---------------|-----------------|----------------------|
-    | **Org Name**    | _tiiuae_           | _google_       | _meta-llama_        | _mistralai_                | _allenai_        | _microsoft_   | _lmsys_         | _HuggingFaceH4_      |
-    | **Base Models** | falcon-7b          | gemma-2b       | Llama-2-7b-hf       | Mistral-7B-v0.1            | OLMo-1B          | phi-2         |                 |                      |
-    |                 | falcon-40b         | gemma-7b       | Llama-2-13b-hf      | Mixtral-8x7B-v0.1          | OLMo-7B          |               |                 |                      |
-    |                 | falcon-180b        |                | Llama-2-70b-hf      |                            |                  |               |                 |                      |
-    | **Chat Models** | falcon-7b-instruct | gemma-2b-it    | Llama-2-7b-chat-hf  | Mistral-7B-Instruct-v0.2   | OLMo-7B-Instruct | phi-2         | vicuna-7b-v1.5  | zephyr-7b-beta       |
-    |                 | falcon-40-instruct | gemma-7b-it    | Llama-2-13b-chat-hf | Mixtral-8x7B-Instruct-v0.1 |                  |               | vicuna-13b-v1.5 | zephyr-7b-gemma-v0.1 |
-    |                 | falcon-180b-chat   |                | Llama-2-70b-chat-hf |                            |                  |               | vicuna-33b-v1.3 |                      |
+    | **Model**       | **FalconModel**     | **GemmaModel** | **LlamaModel**      | **MistralModel**           | **OlmoModel**    | **Phi2Model** | **VicunaModel** | **ZephyrModel**      | **TBD**           |
+    |-----------------|---------------------|----------------|---------------------|----------------------------|------------------|---------------|-----------------|----------------------|-------------------|
+    | **Org Name**    | _tiiuae_            | _google_       | _meta-llama_        | _mistralai_                | _allenai_        | _microsoft_   | _lmsys_         | _HuggingFaceH4_      | _Qwen_            |
+    | **Base Models** | falcon-7b           | gemma-2b       | Llama-2-7b-hf       | Mistral-7B-v0.1            | OLMo-1B          | phi-2         |                 |                      | Qwen1.5-0.5B      |
+    |                 | falcon-40b          | gemma-7b       | Llama-2-13b-hf      | Mixtral-8x7B-v0.1          | OLMo-7B          |               |                 |                      | Qwen1.5-1.8B      |
+    |                 | falcon-180b         |                | Llama-2-70b-hf      |                            |                  |               |                 |                      | Qwen1.5-4B        |
+    |                 |                     |                |                     |                            |                  |               |                 |                      | Qwen1.5-7B        |
+    |                 |                     |                |                     |                            |                  |               |                 |                      | Qwen1.5-14B       |
+    |                 |                     |                |                     |                            |                  |               |                 |                      | Qwen1.5-72B       |
+    | **Chat Models** | falcon-7b-instruct  | gemma-2b-it    | Llama-2-7b-chat-hf  | Mistral-7B-Instruct-v0.2   | OLMo-7B-Instruct | phi-2         | vicuna-7b-v1.5  | zephyr-7b-beta       | Qwen1.5-0.5B-Chat |
+    |                 | falcon-40b-instruct | gemma-7b-it    | Llama-2-13b-chat-hf | Mixtral-8x7B-Instruct-v0.1 |                  |               | vicuna-13b-v1.5 | zephyr-7b-gemma-v0.1 | Qwen1.5-1.8B-Chat |
+    |                 | falcon-180b-chat    |                | Llama-2-70b-chat-hf |                            |                  |               | vicuna-33b-v1.3 |                      | Qwen1.5-4B-Chat   |
+    |                 |                     |                |                     |                            |                  |               |                 |                      | Qwen1.5-7B-Chat   |
+    |                 |                     |                |                     |                            |                  |               |                 |                      | Qwen1.5-14B-Chat  |
+    |                 |                     |                |                     |                            |                  |               |                 |                      | Qwen1.5-72B-Chat  |
 
 2. OpenAI
 

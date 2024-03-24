@@ -17,6 +17,11 @@ class BaseDatabase(ABC):
     def update_doc(self, db_name: str, coll_name: str, doc_id, key, val):
         ...
 
+    def update_doc_multi(self, db_name: str, coll_name: str, doc_id,
+                         update_dict):
+        for key, val in update_dict.items():
+            self.update_doc(db_name, coll_name, doc_id, key, val)
+
     @abstractmethod
     def doc_exists(self, db_name: str, coll_name: str, doc_id) -> bool:
         ...
