@@ -45,7 +45,7 @@ def evaluate(db: BaseDatabase, config: dict):
             print(results)
 
 
-def inspect(db: BaseDatabase, config: dict):
+def inspect(db: BaseDatabase, config: dict, markdown: bool):
     for (bm_cfg, model_cfg) in product(config['benchmarks'], config['models']):
         benchmark = create_benchmark(bm_cfg)
         model_hash = InfoDoc(**model_cfg).doc_id
@@ -78,7 +78,7 @@ def load_config(cfg_path, logger) -> dict:
     return cfg
 
 
-def log_config(db, job_id, bm_cfg, eval_cfg):
+def log_config(db, job_id, bm_cfg, eval_cfg, logger):
     curr_dt_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S%z')
     doc = {
         'job_id': job_id,
@@ -86,11 +86,11 @@ def log_config(db, job_id, bm_cfg, eval_cfg):
         'start_time': curr_dt_str,
         'current_time': curr_dt_str}
     if bm_cfg:
-        benchmark = load_config(bm_cfg)
+        benchmark = load_config(bm_cfg, logger)
         benchmark['filename'] = bm_cfg
         doc['benchmark'] = benchmark
     if eval_cfg:
-        evaluator = load_config(eval_cfg)
+        evaluator = load_config(eval_cfg, logger)
         evaluator['filename'] = eval_cfg
         doc['evaluator'] = evaluator
     db.add_doc('metadata', 'jobs', job_id, doc)
@@ -105,6 +105,8 @@ def main():
     parser.add_argument('-i', '--inspect-config',
                         help='Path to inspect config file')
     parser.add_argument('-j', '--job-id', help='Job ID')
+    parser.add_argument('--markdown', action='store_true',
+                        help='Save inspection results in markdown format')
     args = parser.parse_args()
 
     # Set up logging
@@ -122,7 +124,7 @@ def main():
     else:
         job_id = create_job_id()
     logger.info(f'Starting job: {job_id}')
-    log_config(db, job_id, args.benchmark_config, args.eval_config)
+    log_config(db, job_id, args.benchmark_config, args.eval_config, logger)
 
     # Run the benchmark
     if args.benchmark_config:
@@ -141,7 +143,7 @@ def main():
     # Inspect the results
     if args.inspect_config:
         logger.info('Inspecting results')
-        inspect(db, load_config(args.inspect_config, logger))
+        inspect(db, load_config(args.inspect_config, logger), args.markdown)
     else:
         logger.info('No inspect config provided. Skipped.')
 

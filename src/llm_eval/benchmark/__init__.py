@@ -1,5 +1,8 @@
 """Wrappers for the benchmarks."""
 
+import logging
+logger = logging.getLogger(__name__)
+
 from .base_benchmark import BaseBenchmark, DummyBenchmark
 from .mmlu import MMLUBenchmark
 from .naturalquestions import NaturalQuestionsBenchmark, DummyNQBenchmark

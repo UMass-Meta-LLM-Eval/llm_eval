@@ -2,12 +2,12 @@ import logging
 import io
 
 class TqdmToLogger(io.StringIO):
-    logger = None
+    logger: logging.Logger = None
     level = None
     buf = ''
-    def __init__(self,logger,level=None):
+    def __init__(self,logger,level=15):
         super().__init__()
-        self.logger = logger
+        self.logger: logging.Logger = logger
         self.level = level or logging.INFO
 
     def write(self,buf):

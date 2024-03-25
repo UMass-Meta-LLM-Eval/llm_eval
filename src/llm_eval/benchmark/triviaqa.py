@@ -1,5 +1,6 @@
 from datasets import load_dataset
 from numpy.random import Generator, PCG64
+from tqdm import tqdm
 
 from .base_benchmark import BaseBenchmark
 from ..database import BaseDatabase
@@ -7,8 +8,8 @@ from ..evaluator import BaseEvaluator
 from ..helpers import BenchmarkDoc, InfoDoc, TriviaQaAnswersHelper
 from ..helpers.constants.db import (DATASETS, BENCHMARK, METADATA, MODEL, 
                                     EVALUATOR)
-from ..model import BaseModel
-from tqdm import tqdm
+from ..helpers.logging import TqdmToLogger
+from . import logger
 
 class TriviaQABenchmark(BaseBenchmark):
     BM_NAME = 'TriviaQA'
@@ -24,7 +25,7 @@ class TriviaQABenchmark(BaseBenchmark):
         self._doc = InfoDoc(**bm_config)
         self._use_cache = self._config.get('use_cache', True)
         self.triviaQAhelper = TriviaQaAnswersHelper()
-        
+        self._tqdm_file = TqdmToLogger(logger)
 
     def _create_fewshot_examples(self, num_fewshot: int):
         rng = self._get_rng(self._config.get('seed', 0))
@@ -140,7 +141,8 @@ class TriviaQABenchmark(BaseBenchmark):
         # Shuffle the dataset (if sampling)
         total, shuffled_indices = self._get_shuffled_indices(rng)
 
-        pbar = tqdm(total=total, desc="Computing Results for TriviaQA")
+        pbar = tqdm(total=total, desc="Computing Results for TriviaQA",
+                    file=self._tqdm_file, mininterval=60)
 
         for i in shuffled_indices:
             row = self.dataset[i]

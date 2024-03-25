@@ -20,7 +20,7 @@
       },
       "stderr": {
         "class": "logging.StreamHandler",
-        "level": "DEBUG",
+        "level": 15,
         "formatter": "simple",
         "stream": "ext://sys.stderr"
       }

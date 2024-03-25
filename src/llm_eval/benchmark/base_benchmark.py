@@ -35,7 +35,8 @@ class BaseBenchmark(ABC):
         stored in the given database."""
         ...
 
-    def inspect_results(self, db: BaseDatabase, model_hash: str) -> None:
+    def inspect_results(self, db: BaseDatabase, model_hash: str,
+                        markdown: bool = False) -> None:
         """Inspect the results of the benchmark stored in the given database.
         """
         raise NotImplementedError("This benchmark does not support inspecting "
