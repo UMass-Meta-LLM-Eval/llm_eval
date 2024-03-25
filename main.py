@@ -21,13 +21,21 @@ from llm_eval.database import BaseDatabase, JSONDatabase, MongoDB
 from llm_eval.helpers import InfoDoc
 from llm_eval.helpers.misc import create_job_id
 from llm_eval.helpers.logging import load_logging_cfg
+import torch
+import os
 
+def memory_stats():
+    print('GPU Allocated Memory - ', torch.cuda.memory_allocated()/1024**2)
 
 def benchmark(db: BaseDatabase, config: dict):
     for (bm_cfg, model_cfg) in product(config['benchmarks'], config['models']):
         benchmark = create_benchmark(bm_cfg)
         model = create_model(model_cfg)
         benchmark.run(model, db)
+        print('Benchmark Run complete - ', str(model_cfg))
+        del model
+        torch.cuda.empty_cache()
+        memory_stats()
 
 
 def evaluate(db: BaseDatabase, config: dict):
@@ -43,6 +51,10 @@ def evaluate(db: BaseDatabase, config: dict):
             model_hash = InfoDoc(**model_cfg).doc_id
             results = benchmark.compute_results(model_hash, db, evaluator)
             print(results)
+        print('Evaluator Run complete - ', str(evaluator_cfg))
+        del evaluator
+        torch.cuda.empty_cache()
+        memory_stats()
 
 
 def inspect(db: BaseDatabase, config: dict, markdown: bool):
