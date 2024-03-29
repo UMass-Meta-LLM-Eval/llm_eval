@@ -1,7 +1,7 @@
 """Wrappers for the LLMs."""
 
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('model')
 
 from .base_model import BaseModel, DummyModel
 from .hf_model import (FalconModel, GemmaModel, LlamaModel, MistralModel,

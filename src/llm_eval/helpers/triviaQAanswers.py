@@ -1,14 +1,9 @@
-class TriviaQaAnswersHelper:
+def find_acceptable_answers_triviaqa(doc): 
+    acceptable_answers = [doc['answer']['value']]
 
-    def __init__(self):
-        ...
+    aliases = doc['answer'].get('aliases', []) 
+    acceptable_answers.extend(aliases)
 
-    def findAcceptableAnswersforTriviaQA(self, doc : object): 
-        acceptable_answers = [doc['answer']['value']]
+    acceptable_answers = acceptable_answers[:10]
 
-        aliases = doc['answer'].get('aliases', []) 
-        acceptable_answers.extend(aliases)
-
-        acceptable_answers = acceptable_answers[:10]
-
-        return acceptable_answers
+    return acceptable_answers

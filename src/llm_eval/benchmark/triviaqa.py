@@ -5,10 +5,10 @@ from tqdm import tqdm
 from .base_benchmark import BaseBenchmark
 from ..database import BaseDatabase
 from ..evaluator import BaseEvaluator
-from ..helpers import BenchmarkDoc, InfoDoc, TriviaQaAnswersHelper
+from ..helpers import BenchmarkDoc, InfoDoc, find_acceptable_answers_triviaqa
 from ..helpers.constants.db import (DATASETS, BENCHMARK, METADATA, MODEL, 
                                     EVALUATOR)
-from ..helpers.logging import TqdmToLogger
+from ..helpers.logging.tqdm_to_logger import TqdmToLogger
 from . import logger
 
 class TriviaQABenchmark(BaseBenchmark):
@@ -24,9 +24,8 @@ class TriviaQABenchmark(BaseBenchmark):
         self._fewshot_prefix = self._create_fewshot_examples(bm_config.get('num_fewshot', 0))
         self._doc = InfoDoc(**bm_config)
         self._use_cache = self._config.get('use_cache', True)
-        self.triviaQAhelper = TriviaQaAnswersHelper()
         self._tqdm_file = TqdmToLogger(logger)
-
+        
     def _create_fewshot_examples(self, num_fewshot: int):
         rng = self._get_rng(self._config.get('seed', 0))
         fewshot_examples = []
@@ -98,13 +97,14 @@ class TriviaQABenchmark(BaseBenchmark):
         total, shuffled_indices = self._get_shuffled_indices(rng)
 
         num_fewshot = self._config.get('num_fewshot', 0)
-        pbar = tqdm(total=total, desc='Evaluating TriviaQA')
+        pbar = tqdm(total=total, desc=f'Benchmarking {self.BM_NAME}',
+                    file=self._tqdm_file, mininterval=60)
 
         for i in shuffled_indices:
-            row = self.training_data[i]
+            row = self.dataset[i]
             question_text = row['question']
             prompt = self.create_prompt(question_text)
-            acceptable_answers = self.triviaQAhelper.findAcceptableAnswersforTriviaQA(row)
+            acceptable_answers = find_acceptable_answers_triviaqa(row)
 
             # Store the question in the database (if it doesn't exist already)
             question_doc = InfoDoc(
@@ -141,14 +141,14 @@ class TriviaQABenchmark(BaseBenchmark):
         # Shuffle the dataset (if sampling)
         total, shuffled_indices = self._get_shuffled_indices(rng)
 
-        pbar = tqdm(total=total, desc="Computing Results for TriviaQA",
+        pbar = tqdm(total=total, desc=f'Evaluating {self.BM_NAME}',
                     file=self._tqdm_file, mininterval=60)
 
         for i in shuffled_indices:
             row = self.dataset[i]
             question_text = row['question']
             prompt = self.create_prompt(question_text)
-            acceptable_answers = self.triviaQAhelper.findAcceptableAnswersforTriviaQA(row)
+            acceptable_answers = find_acceptable_answers_triviaqa(row)
 
             # Get the model's prediction and evaluate it
             question_hash = InfoDoc(
@@ -167,7 +167,7 @@ class TriviaQABenchmark(BaseBenchmark):
             # Otherwise, evaluate the prediction and store the result
             else:
                 result, info = evaluator.evaluate(
-                    row['question']['text'], prediction,
+                    question_text, prediction,
                     acceptable_answers)
                 
                 doc.evaluation[evaluator.hashval] = {'result': result,
@@ -183,18 +183,24 @@ class TriviaQABenchmark(BaseBenchmark):
         pbar.close()
         return correct / checked
     
-    def inspect_results(self, db: BaseDatabase, model_hash: str):
+    def inspect_results(self, db: BaseDatabase, model_hash: str,
+                        markdown: bool=False):
         rng = self._get_rng(self._config.get('seed', 0))
         # Shuffle the dataset (if sampling)
         total, shuffled_indices = self._get_shuffled_indices(rng)
 
-        num_fewshot = self._config.get('num_fewshot', 0)
+        if markdown:
+            pbar = tqdm(total=total, desc=f'Inspecting {self.BM_NAME}',
+                        file=self._tqdm_file, mininterval=1)
+        else:
+            pbar = tqdm(total=total, desc=f'Inspecting {self.BM_NAME}')
+
         n = 0
         for i in shuffled_indices:
             row = self.dataset[i]
             question_text = row['question']
             prompt = self.create_prompt(question_text)
-            acceptable_answers = self.triviaQAhelper.findAcceptableAnswersforTriviaQA(row)
+            acceptable_answers = find_acceptable_answers_triviaqa(row)
             
             question_hash = InfoDoc(
                 question=question_text,
@@ -202,12 +208,18 @@ class TriviaQABenchmark(BaseBenchmark):
             key = BenchmarkDoc(self.hashval, model_hash, question_hash,
                                prompt).doc_id
             doc = self._get_doc_from_db(db, self.BM_NAME, key)
-            doc.inspect(db)
+            s = doc.inspect(db, markdown=markdown)
+            if markdown:
+                with open('inspect.md', 'a') as f:
+                    f.write(s+'\n\n---\n\n')
             n += 1
+            pbar.update(1)
             if n >= total:
                 break
-            if input() == 'q':
+            if not markdown and input() == 'q':
                 break
+
+        pbar.close()
 
     @property
     def config(self):

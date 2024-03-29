@@ -1,7 +1,7 @@
 """Wrappers for the benchmarks."""
 
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('benchmark')
 
 from .base_benchmark import BaseBenchmark, DummyBenchmark
 from .mmlu import MMLUBenchmark

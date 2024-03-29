@@ -94,7 +94,7 @@ class BenchmarkDoc(BaseDoc):
             response=self.response,
             evaluations=evals)
 
-    def inspect(self, db: BaseDatabase, markdown: bool = False):
+    def inspect(self, db: BaseDatabase, markdown: bool = False) -> str:
         benchmark_name = db.get_doc(METADATA, BENCHMARK, self.bm_hash)['name']
         model_name = db.get_doc(METADATA, MODEL, self.model_hash)['name']
         data = db.get_doc(DATASETS, BENCHMARK, self.question_hash)

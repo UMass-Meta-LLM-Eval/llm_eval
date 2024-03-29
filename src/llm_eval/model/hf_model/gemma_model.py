@@ -10,7 +10,6 @@ class GemmaModel(BaseHFModel):
 
     def __init__(self, model_config: dict):
         self._config = model_config
-        self.HF_ORG_NAME = 'google'
         self.bos = '<bos>'
 
         model_name = self._config['model']
@@ -26,8 +25,9 @@ class GemmaModel(BaseHFModel):
         self._doc = InfoDoc(**model_config)
     
     def _predict(self, prompt: str) -> str:
-        sequences = self.pipeline.generate(**self.tokenizer(prompt, return_tensors="pt").to("cuda"),
-                                           max_new_tokens=self._config.get('max_new_tokens', 32))
+        sequences = self.pipeline.generate(
+            **self.tokenizer(prompt, return_tensors='pt').to('cuda'),
+            max_new_tokens=self._config.get('max_new_tokens', 32))
         response = self.tokenizer.decode(sequences[0])
         
         if response.startswith(self.bos):

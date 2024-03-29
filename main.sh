@@ -24,7 +24,7 @@ cd /work/pi_dhruveshpate_umass_edu/grp22/users/<<username>>/projects/llm_eval/
 
 # Run the script
 echo "Running main.py"
-python main.py "$@"
+python main.py "$@" -j ${SLURM_JOBID}
 
 # Done
 echo "Job complete"

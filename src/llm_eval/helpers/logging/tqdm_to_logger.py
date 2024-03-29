@@ -1,11 +1,13 @@
 import logging
 import io
 
+from .constants import PROGRESS
+
 class TqdmToLogger(io.StringIO):
     logger: logging.Logger = None
     level = None
     buf = ''
-    def __init__(self,logger,level=15):
+    def __init__(self,logger,level=PROGRESS):
         super().__init__()
         self.logger: logging.Logger = logger
         self.level = level or logging.INFO

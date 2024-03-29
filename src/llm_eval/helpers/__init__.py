@@ -1,3 +1,3 @@
 from .documents import BenchmarkDoc, InfoDoc, cfg_to_hash
 from .nqanswers import NQAnswersHelper
-from .triviaQAanswers import TriviaQaAnswersHelper
+from .triviaQAanswers import find_acceptable_answers_triviaqa
