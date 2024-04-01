@@ -1,5 +1,6 @@
 from .base_model import BaseModel
 from ..helpers.documents import InfoDoc
+from . import logger
 
 class HumanModel(BaseModel):
     def __init__(self, model_config: dict):

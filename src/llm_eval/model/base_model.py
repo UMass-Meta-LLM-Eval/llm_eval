@@ -36,7 +36,7 @@ class BaseModel(ABC):
 class DummyModel(BaseModel):
     def __init__(self, model_config: dict):
         self._config = model_config
-        self.prefix = model_config['prefix']
+        self.prefix = model_config.get('prefix', '')
         self._doc = InfoDoc(**model_config)
 
     def _predict(self, prompt: str) -> str:

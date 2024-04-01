@@ -35,7 +35,8 @@ class BaseBenchmark(ABC):
         stored in the given database."""
         ...
 
-    def inspect_results(self, db: BaseDatabase, model_hash: str) -> None:
+    def inspect_results(self, db: BaseDatabase, model_hash: str,
+                        markdown: bool = False) -> None:
         """Inspect the results of the benchmark stored in the given database.
         """
         raise NotImplementedError("This benchmark does not support inspecting "
@@ -55,7 +56,6 @@ class BaseBenchmark(ABC):
         ...
 
     def _get_doc_from_db(self, db: BaseDatabase, bm_name, key):
-        print(f'Getting doc from db: {BENCHMARK}/{bm_name} with key: {key}')
         doc = db.get_doc(BENCHMARK, bm_name, key)
         return BenchmarkDoc.from_json(doc)
 

@@ -1,5 +1,6 @@
 from datasets import load_dataset
 from numpy.random import Generator, PCG64
+from tqdm import tqdm
 
 from .base_benchmark import BaseBenchmark
 from ..database import BaseDatabase
@@ -7,8 +8,8 @@ from ..evaluator import BaseEvaluator
 from ..helpers import BenchmarkDoc, InfoDoc, NQAnswersHelper
 from ..helpers.constants.db import (DATASETS, BENCHMARK, METADATA, MODEL, 
                                     EVALUATOR)
-from ..model import BaseModel
-from tqdm import tqdm
+from ..helpers.logging import TqdmToLogger
+from . import logger
 
 class NaturalQuestionsBenchmark(BaseBenchmark):
     BM_NAME = 'naturalquestions'
@@ -24,6 +25,7 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
             self._config.get('num_fewshot', 0))
         self._doc = InfoDoc(**bm_config)
         self._use_cache = self._config.get('use_cache', True)
+        self._tqdm_file = TqdmToLogger(logger)
 
     def _create_fewshot_examples(self, num_fewshot: int):
         rng = self._get_rng(self._config.get('seed', 0))
@@ -154,7 +156,7 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
         total, shuffled_indices = self._get_shuffled_indices(rng)
 
         num_fewshot = self._config.get('num_fewshot', 0)
-        pbar = tqdm(total=total)
+        pbar = tqdm(total=total, file=self._tqdm_file)
         for i in shuffled_indices:
 
             # Create the prompt and find acceptable answers
