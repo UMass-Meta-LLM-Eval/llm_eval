@@ -5,10 +5,11 @@ from tqdm import tqdm
 from .base_benchmark import BaseBenchmark
 from ..database import BaseDatabase
 from ..evaluator import BaseEvaluator
-from ..helpers import BenchmarkDoc, InfoDoc, NQAnswersHelper
+from ..helpers import BenchmarkDoc, InfoDoc, NQAnswersHelper, templates
 from ..helpers.constants.db import (DATASETS, BENCHMARK, METADATA, MODEL, 
                                     EVALUATOR)
 from ..helpers.logging import TqdmToLogger
+from ..helpers.logging.constants import UPDATE
 from . import logger
 
 class NaturalQuestionsBenchmark(BaseBenchmark):
@@ -19,13 +20,44 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
     def __init__(self, bm_config: dict):
         self._config = bm_config
         self.nqhelper = NQAnswersHelper()
+        
+        # Load dataset
         self._dataset = load_dataset('natural_questions',
                                      trust_remote_code=True)
-        self._fewshot_prefix = self._create_fewshot_examples(
-            self._config.get('num_fewshot', 0))
+
+        # Load template
+        template_name = self._config.get('template', '').upper()
+        if template_name == '':
+            logger.warning('Template name not specified. Defaulting to '
+                           'BASE_SIMPLE.')
+            template_name = 'BASE_SIMPLE'
+        logger.log(UPDATE, 'Using template: %s', template_name)
+        
+        # Set up fewshot examples
+        num_fewshot = self._config.get('num_fewshot')
+        if num_fewshot is None:
+            logger.warning('Fewshot examples not specified. Defaulting to 0.')
+            num_fewshot = 0
+        self._set_templates(template_name, num_fewshot)
+        self._fewshot = self._create_fewshot_examples(num_fewshot)
+        
+        # Set up other helpers and utilities
         self._doc = InfoDoc(**bm_config)
         self._use_cache = self._config.get('use_cache', True)
         self._tqdm_file = TqdmToLogger(logger)
+
+    def _set_templates(self, template_name: str, num_fewshot: int):
+        template_cls = getattr(templates, template_name)
+        if num_fewshot > 0:
+            self._question_template = template_cls.QUESTION
+        elif hasattr(template_cls, 'QUESTION_ZERO_SHOT'):
+            self._question_template = template_cls.QUESTION_ZERO_SHOT
+        else:
+            logger.warning('Zero-shot template for "%s"  not found. Creating '
+                           'prompts with fewshot template. This may lead to '
+                           'unexpected results.', template_name)
+            self._question_template = template_cls.QUESTION
+        self._fewshot_template = template_cls.FEWSHOT
 
     def _create_fewshot_examples(self, num_fewshot: int):
         rng = self._get_rng(self._config.get('seed', 0))
@@ -62,7 +94,7 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
         # Create the prompt prefix
         prompt = ''
         for (q, a) in fewshot_examples:
-            prompt += self.FEWSHOT_TEMPLATE.format(question=q, answer=a[0])
+            prompt += self._fewshot_template.format(question=q, answer=a[0])
 
         return prompt
 
@@ -84,10 +116,8 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
         return total, shuffled_indices
 
     def create_prompt(self, question:int, **kwargs):
-        prompt = self._fewshot_prefix + self.QUESTION_TEMPLATE.format(
-            question=question)
-
-        return prompt
+        return self._question_template.format(
+            fewshot=self._fewshot, question=question)
 
     def run(self, model, db: BaseDatabase):
         # Set up the benchmark run
@@ -225,104 +255,6 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
             n += 1
             if n >= total:
                 break
-            if input() == 'q':
-                break
-
-    @property
-    def config(self):
-        return self._config
-    
-    @property
-    def hashval(self) -> str:
-        return self._doc.doc_id
-
-
-class DummyNQBenchmark(BaseBenchmark):
-    BM_NAME = 'nq_dummy'
-    def __init__(self, bm_config: dict):
-        self._config = bm_config
-        self._dataset = [{
-            'question': 'When was the last time anyone was on the moon?',
-            'references': ['14 December 1972 UTC', 'December 1972']}]
-        self._doc = InfoDoc(**bm_config)
-        self._use_cache = self._config.get('use_cache', True)
-
-    def create_prompt(self, question, **kwargs):
-        return f'Q. {question} A: '
-
-    def run(self, model, db: BaseDatabase):
-        db.add_doc(METADATA, BENCHMARK, self.hashval, self._doc.to_json())
-        db.add_doc(METADATA, MODEL, model.hashval, model.config)
-        for item in self._dataset:
-            prompt = self.create_prompt(item['question'])
-
-            # Store the question in the database (if it doesn't exist already)
-            question_doc = InfoDoc(question=item['question'],
-                                   references=item['references'])
-            if not db.doc_exists(DATASETS, BENCHMARK, question_doc.doc_id):
-                db.add_doc(DATASETS, BENCHMARK, question_doc.doc_id,
-                           question_doc.to_json())
-
-            # If caching is enabled and document already exists, skip
-            doc = BenchmarkDoc(self.hashval, model.hashval,
-                               question_doc.doc_id, prompt)
-            if self._use_cache and db.doc_exists(BENCHMARK, self.BM_NAME,
-                                                 doc.doc_id):
-                continue
-
-            # Make model prediction and store in the database
-            prediction = model.predict(prompt)
-            doc.response = prediction
-            db.add_doc(BENCHMARK, self.BM_NAME, doc.doc_id, doc.to_json())
-
-    def compute_results(self, model_hash: str, db: BaseDatabase,
-                        evaluator: BaseEvaluator):
-        db.add_doc(METADATA, EVALUATOR, evaluator.hashval, evaluator.config)
-        checked = 0
-        correct = 0
-        for item in self._dataset:
-            prompt = self.create_prompt(item['question'])
-
-            # Get the model's prediction and evaluate it
-            question_hash = InfoDoc(
-                question=item['question'],
-                references=item['references']).doc_id
-            key = BenchmarkDoc(self.hashval, model_hash, question_hash,
-                               prompt).doc_id
-            doc = self._get_doc_from_db(db, self.BM_NAME, key)
-            prediction = doc.response
-
-            # If caching is enabled and evaluation already exists, skip
-            if evaluator.config.get('use_cache', True) \
-                    and evaluator.hashval in doc.evaluation:
-                result = doc.evaluation[evaluator.hashval]['result']
-
-            # Otherwise, evaluate the prediction and store the result
-            else:
-                result, info = evaluator.evaluate(
-                    item['question'], prediction,
-                    item['references'])
-                
-                doc.evaluation[evaluator.hashval] = {'result': result,
-                                                     'info': info}
-                db.add_doc('benchmark', self.BM_NAME, key, doc.to_json())
-
-            # Update the statistics
-            checked += 1
-            correct += int(result)
-
-        return correct / checked
-
-    def inspect_results(self, db: BaseDatabase, model_hash: str):
-        for item in self._dataset:
-            prompt = self.create_prompt(item['question'])
-            question_hash = InfoDoc(
-                question=item['question'],
-                references=item['references']).doc_id
-            key = BenchmarkDoc(self.hashval, model_hash, question_hash,
-                               prompt).doc_id
-            doc = self._get_doc_from_db(db, self.BM_NAME, key)
-            doc.inspect(db)
             if input() == 'q':
                 break
 
