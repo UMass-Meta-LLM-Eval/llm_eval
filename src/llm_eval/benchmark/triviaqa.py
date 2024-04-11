@@ -9,6 +9,7 @@ from ..helpers import BenchmarkDoc, InfoDoc, find_acceptable_answers_triviaqa
 from ..helpers.constants.db import (DATASETS, BENCHMARK, METADATA, MODEL, 
                                     EVALUATOR)
 from ..helpers.logging.tqdm_to_logger import TqdmToLogger
+from llm_eval.helpers.misc import truncate_response
 from . import logger
 
 class TriviaQABenchmark(BaseBenchmark):
@@ -68,8 +69,8 @@ class TriviaQABenchmark(BaseBenchmark):
     def _get_rng(self, seed: int):
         return Generator(PCG64(seed=seed))
     
-    def _process_response(self, response: str):
-        return response.split('\n')[0].strip()
+    def _process_response(self, config, response: str):
+        return truncate_response(config, response)
 
     def create_prompt(self, question:int, **kwargs):
         prompt = self._fewshot_prefix + self.QUESTION_TEMPLATE.format(
@@ -157,7 +158,7 @@ class TriviaQABenchmark(BaseBenchmark):
             key = BenchmarkDoc(self.hashval, model_hash, question_hash,
                                prompt).doc_id
             doc = self._get_doc_from_db(db, self.BM_NAME, key)
-            prediction = self._process_response(doc.response)
+            prediction = self._process_response(evaluator.config, doc.response)
 
             # If caching is enabled and evaluation already exists, skip
             if evaluator.config.get('use_cache', True) \
