@@ -217,3 +217,9 @@ python -m src.database.mongodb_test
     
     Makes queries to the human using CLI. Human must answer with `y`, `n`, `yy`,
     or `nn` for each prompt.
+
+Note - To run Evaluator on Truncation Logic, Logic = newline, newlinequestion, skip, eleutherai
+    ```
+    "truncate": "newline"```
+
+To define a custom Truncation Logic, Please feel free to look at `misc/truncate_response.py`
