@@ -9,7 +9,7 @@ from ..helpers import BenchmarkDoc, InfoDoc, NQAnswersHelper, templates
 from ..helpers.constants.db import (DATASETS, BENCHMARK, METADATA, MODEL, 
                                     EVALUATOR)
 from ..helpers.logging import TqdmToLogger
-from ..helpers.logging.constants import UPDATE
+from ..helpers.constants.logging import UPDATE
 from . import logger
 
 class NaturalQuestionsBenchmark(BaseBenchmark):

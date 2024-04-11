@@ -21,7 +21,7 @@ from llm_eval.database import BaseDatabase, JSONDatabase, MongoDB
 from llm_eval.helpers import InfoDoc
 from llm_eval.helpers.misc import create_job_id
 from llm_eval.helpers.logging import load_logging_cfg
-from llm_eval.helpers.logging import constants as logging_constants
+from llm_eval.helpers.constants import logging as logging_constants
 import torch
 import os
 

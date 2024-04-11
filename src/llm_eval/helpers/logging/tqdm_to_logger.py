@@ -1,7 +1,7 @@
 import logging
 import io
 
-from .constants import PROGRESS
+from ..constants.logging import PROGRESS
 
 class TqdmToLogger(io.StringIO):
     logger: logging.Logger = None

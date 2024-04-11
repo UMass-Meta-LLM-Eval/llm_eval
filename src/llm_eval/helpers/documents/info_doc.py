@@ -5,7 +5,8 @@ class InfoDoc(BaseDoc):
     def __init__(self, **kwargs):
         self._dict = kwargs
 
-    def to_json(self):
+    def to_json(self) -> dict:
+        """Return the document as a JSON serializable dictionary."""
         return self._dict
     
     @classmethod
