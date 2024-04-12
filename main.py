@@ -30,7 +30,8 @@ logging.addLevelName(logging_constants.PROGRESS, 'PROGRESS')
 logging.addLevelName(logging_constants.UPDATE, 'UPDATE')
 logger = logging.getLogger('llm_eval')
 
-def memory_stats():
+def clear_gpu():
+    torch.cuda.empty_cache()
     logger.info('GPU Allocated Memory: '
                 f'{torch.cuda.memory_allocated()/1024**3:.2f} GB')
 
@@ -47,8 +48,7 @@ def benchmark(db: BaseDatabase, config: dict):
                           f'benchmark `{bm_cfg.get("name", "unknown")}`, '
                           f'model `{model_cfg.get("name", "unknown")}`.')
         del model
-        torch.cuda.empty_cache()
-        memory_stats()
+        clear_gpu()
 
 
 def evaluate(db: BaseDatabase, config: dict):
@@ -72,8 +72,7 @@ def evaluate(db: BaseDatabase, config: dict):
                           f'model `{model_cfg.get("name", "unknown")}`: '
                           f'{results:.2f}')
         del evaluator
-        torch.cuda.empty_cache()
-        memory_stats()
+        clear_gpu()
 
 
 def inspect(db: BaseDatabase, config: dict, markdown: bool):
@@ -149,6 +148,8 @@ def main():
                         help='Config for both benchmark and evaluation')
     parser.add_argument('-be', '--benchmark-eval',
                         help='Config for both benchmark and evaluation')
+    parser.add_argument('--json-db', action='store_true',
+                        help='Use JSON database instead of MongoDB')
     args = parser.parse_args()
 
     # Override benchmark and evaluation config if combined config is provided
@@ -165,8 +166,12 @@ def main():
     
 
     # Create the database
-    # db = JSONDatabase('json_db', 'data/')
-    db = MongoDB({'uri': os.getenv('MONGODB_URI')})
+    if args.json_db:
+        db = JSONDatabase('json_db', 'data/')
+        logger.log(logging_constants.UPDATE, 'JSON database initialized')
+    else:
+        db = MongoDB({'uri': os.getenv('MONGODB_URI')})
+        logger.log(logging_constants.UPDATE, 'MongoDB initialized')
 
     # Create the job ID and log the job
     if args.job_id:

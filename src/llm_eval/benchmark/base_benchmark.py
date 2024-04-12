@@ -9,6 +9,7 @@ from ..helpers.constants.db import (DATASETS, BENCHMARK, METADATA, MODEL,
                                     EVALUATOR)
 from ..helpers.constants.logging import UPDATE
 from ..helpers.logging.tqdm_to_logger import TqdmToLogger
+from ..helpers.misc import truncate_response
 from ..database import BaseDatabase
 from ..evaluator import BaseEvaluator
 from . import logger
@@ -19,10 +20,33 @@ class BaseBenchmark(ABC):
 
         The implementation should load the dataset and any other necessary
         resources after calling the `super()` method, or completely override
-        this method, but keep the signature of this `__init__` method."""
+        this method, but keep the signature of this `__init__` method.
+        
+        In addition to the public properties, following attributes are
+        available after initialization:
+        - `_seed: int`: Seed for random number generator.
+        - `_use_cache: bool`: Whether to use caching.
+        - `_tqdm_file`: File to which tqdm writes progress.
+        - `_num_fewshot: int`: Number of fewshot examples.
+        - `_question_template: str`: Template for questions.
+        - `_fewshot_template: str`: Template for fewshot examples.
+        - `_fewshot: str`: Formatted fewshot examples.
+        - `_shuffled_indices: list[int]`: Shuffled indices of samples.
+        """
 
         # Set the benchmark's configuration
         self._config = bm_config
+
+        # Set the seed
+        seed = self.config.get('seed')
+        if seed is None:
+            logger.warning('Seed not specified. Defaulting to 0.')
+            seed = 0
+        self._seed: int = seed
+
+        # Set up other helpers and utilities
+        self._use_cache: bool = self.config.get('use_cache', True)
+        self._tqdm_file = TqdmToLogger(logger)
 
         # Load template
         template_name = self.config.get('template', '').upper()
@@ -40,10 +64,33 @@ class BaseBenchmark(ABC):
         self._set_templates(template_name)
         self._fewshot = self._create_fewshot_examples()
 
-        # Set up other helpers and utilities
-        self._use_cache: bool = self.config.get('use_cache', True)
-        self._tqdm_file = TqdmToLogger(logger)
+        # Compute sample indices
+        total, shuffled_indices = self._get_shuffled_indices(
+            self._get_rng(self._seed), self.dataset_len)
+        self._total_questions = total
+        self._shuffled_indices = shuffled_indices
 
+    def _get_rng(self, seed: int) -> Generator:
+        """Utility method to get a random number generator with the given
+        seed."""
+        return Generator(PCG64(seed=seed))
+    
+    def _get_shuffled_indices(self, rng: Generator, dataset_len: int
+                              ) -> tuple[int, list[int]]:
+        """Utility method to get the total number of samples and a
+        shuffled list of indices (deterministic given the seed) for the
+        dataset."""
+        if 'num_samples' in self.config:
+            total = self.config['num_samples']
+            logger.info('Running benchmark on a %d sample subset.', total)
+            shuffled_indices = rng.permutation(dataset_len)[:total].tolist()
+        else:
+            logger.info('Running benchmark on the full dataset.')
+            total = dataset_len
+            shuffled_indices = range(total)
+
+        return total, shuffled_indices
+        
     def _set_templates(self, template_name: str):
         """Set the question and fewshot templates for the benchmark."""
         template_cls = getattr(templates, template_name)
@@ -66,9 +113,9 @@ class BaseBenchmark(ABC):
     def _create_fewshot_examples(self) -> str:
         """Create fewshot examples for the benchmark."""
         fewshot = ''
-        for (question, acceptable_answers) in self.fewshot_generator:
+        for (question, answer) in self.fewshot_generator:
             fewshot += self._fewshot_template.format(
-                question=question, answer=acceptable_answers[0])
+                question=question, answer=answer)
         return fewshot
 
     def _create_prompt(self, question: str, **kwargs):
@@ -77,6 +124,21 @@ class BaseBenchmark(ABC):
         few-shot learning examples."""
         return self._question_template.format(question=question,
                                               fewshot=self._fewshot)
+    
+    def _parse_response(self, response: str, config: dict) -> str:
+        """Parse the model's response to the question. This method should
+        extract the answer from the model's response, which will then be
+        sent to the evaluator."""
+        return truncate_response(config, response)
+    
+    def _validate_num_fewshot(self, num_fewshot: int, n_train: int) -> int:
+        """Validate the number of fewshot examples."""
+        if num_fewshot > n_train:
+            logger.warning('Fewshot number (%d) is greater than training data '
+                           'size (%d). Setting fewshot number to %d.',
+                           num_fewshot, n_train, n_train)
+            num_fewshot = n_train
+        return num_fewshot
 
     def run(self, model, db: BaseDatabase):
         """Run the benchmark with the given model configuration and store the
@@ -143,7 +205,7 @@ class BaseBenchmark(ABC):
             key = BenchmarkDoc(self.hashval, model_hash, question_hash,
                                prompt).doc_id
             doc = self._get_doc_from_db(db, self.BM_NAME, key)
-            prediction = self.parse_response(doc.response)
+            prediction = self._parse_response(doc.response, evaluator.config)
 
             # If eval caching is enabled and evaluation already exists, skip
             if evaluator.config.get('use_cache', True) \
@@ -196,25 +258,6 @@ class BaseBenchmark(ABC):
             if not markdown and input() == 'q':
                 break
 
-    def _get_rng(self, seed: int) -> Generator:
-        """Utility method to get a random number generator with the given
-        seed."""
-        return Generator(PCG64(seed=seed))
-    
-    def _get_shuffled_indices(self, rng: Generator, dataset_len: int
-                              ) -> tuple[int, list[int]]:
-        """Utility method to get the total number of samples and a
-        shuffled list of indices (deterministic given the seed) for the
-        dataset."""
-        if 'num_samples' in self.config:
-            total = self.config['num_samples']
-            shuffled_indices = rng.permutation(dataset_len).tolist()
-        else:
-            total = dataset_len
-            shuffled_indices = range(total)
-
-        return total, shuffled_indices
-
     @property
     def config(self) -> dict:
         """Return the benchmark's configuration."""
@@ -231,11 +274,18 @@ class BaseBenchmark(ABC):
         string."""
         return self.doc.doc_id
 
+    @property
+    def total_questions(self) -> int:
+        """Total number of questions in the benchmark.
+        
+        This would be the number of samples if the benchmark is run on a
+        subset of the dataset, otherwise it would be length of the dataset."""
+        return self._total_questions
+
+    @property
     @abstractmethod
-    def parse_response(self, response: str) -> str:
-        """Parse the model's response to the question. This method should
-        extract the answer from the model's response, which will then be
-        sent to the evaluator."""
+    def dataset_len(self) -> int:
+        """Total length of the dataset (not the number of samples)."""
 
     @property
     @abstractmethod
@@ -244,14 +294,10 @@ class BaseBenchmark(ABC):
 
     @property
     @abstractmethod
-    def fewshot_generator(self) -> Gen[tuple[str, list[str]], None, None]:
+    def fewshot_generator(self) -> Gen[tuple[str, str], None, None]:
         """Return a generator that yields fewshot examples from the
         benchmark."""
 
-    @property
-    @abstractmethod
-    def total_questions(self) -> int:
-        """Return the total number of questions in the benchmark."""
 
 class DummyBenchmark(BaseBenchmark):
     ...
