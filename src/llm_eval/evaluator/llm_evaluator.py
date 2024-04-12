@@ -44,12 +44,23 @@ class LLMEvaluator(BaseEvaluator):
                                                                  response,
                                                                  references)
         if is_exact_match:
-            return True, {'evaluation': 'correct'}
+            return True, {'evaluation': 'correct',
+                          'parsed_successfully': 'N/A'}
 
         # Provide the llm with the question, references, and response
         prompt = self._format_prompt(question, references, response)
         evaluation = self._model.predict(prompt).lower().strip()
-        return evaluation.startswith('correct'), {'evaluation': evaluation}
+        if evaluation.startswith('correct'):
+            ev = True
+            parsed_successfully = True
+        elif evaluation.startswith('incorrect'):
+            ev = False
+            parsed_successfully = True
+        else:
+            ev = False
+            parsed_successfully = False
+        return ev, {'evaluation': evaluation,
+                    'parsed_successfully': parsed_successfully}
 
     @property
     def config(self):

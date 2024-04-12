@@ -34,6 +34,18 @@ class JSONDatabase(BaseDatabase):
         data[doc_id] = doc
         self._save_data(f'{db_name}/{coll_name}.json', data)
 
+    def update_doc(self, db_name: str, coll_name: str, doc_id, key, val):
+        doc = self.get_doc(db_name, coll_name, doc_id)
+        keys = key.split('.')
+        if len(keys) == 1:
+            doc[key] = val
+        else:
+            doc2 = doc
+            for k in keys[:-1]:
+                doc2 = doc2[k]
+            doc2[keys[-1]] = val
+        self.add_doc(db_name, coll_name, doc_id, doc)
+
     def doc_exists(self, db_name, coll_name, doc_id) -> bool:
         data = self._load_data(f'{db_name}/{coll_name}.json')
         return doc_id in data

@@ -16,7 +16,9 @@ dependencies = [
   "evaluate",
   "openai",
   "anthropic",
-  "sentencepiece"
+  "sentencepiece",
+  "bert_score",
+  "overrides"
 ]
 authors = [
   { name="Kartik Choudhary", email="kartikchoudh@umass.edu" },
