@@ -3,6 +3,7 @@ from .classic_evaluator import (ExactMatchEvaluator, ContainsMatchEvaluator,
                                 ContainsWordsEvaluator)
 from .human_evaluator import HumanEvaluator
 from .llm_evaluator import LLMEvaluator
+from .hf_evaluator import BERTEvaluator
 
 classes = {
     'DummyEvaluator': DummyEvaluator,
@@ -11,6 +12,7 @@ classes = {
     'ContainsWordsEvaluator': ContainsWordsEvaluator,
     'HumanEvaluator': HumanEvaluator,
     'LLMEvaluator': LLMEvaluator,
+    'BERTEvaluator': BERTEvaluator,
     # Add new evaluators here
 }
 
