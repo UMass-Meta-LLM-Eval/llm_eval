@@ -14,6 +14,10 @@ def _get_truncation_logic(logic):
         return {
             'until': ['\nQ:']
         }
+    elif logic == 'newlinequestion2':
+        return {
+            'until': ['\nQuestion:']
+        }
     elif logic == 'eleutherai':
         return {
         'until': ['\n', '.', ','],
