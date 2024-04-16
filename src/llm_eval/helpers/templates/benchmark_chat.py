@@ -38,3 +38,34 @@ class CHAT_V2:
     Q: {question}
     A:''').strip()
     """Zero-shot question template V2 for chat models."""
+
+
+class CHAT_MMLU:
+    """MMLU templates for chat models."""
+
+    FEWSHOT: str = 'Question: {question}\nResponse: {answer}\n\n'
+    """Fewshot MMLU template for chat models."""
+    
+    QUESTION: str = dedent('''
+    You are a part of a question answering benchmark. Look at the following 
+    examples on how to answer the questions.
+
+    ```
+    {fewshot}
+    ```
+
+    Your task is to answer the following question. Remember to be concise and 
+    only give the answer in a few words.
+
+    Question: {question}
+    Response:''').strip()
+    """Question template V2 for chat models."""
+    
+    QUESTION_ZERO_SHOT: str = dedent('''
+    You are a part of a question answering benchmark. Your task is to answer 
+    the following question. Remember to be concise and only give the answer in
+    a few words.
+
+    Question: {question}
+    Response:''').strip()
+    """Zero-shot question template V2 for chat models."""

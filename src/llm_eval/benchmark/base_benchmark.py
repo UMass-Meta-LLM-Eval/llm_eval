@@ -32,6 +32,7 @@ class BaseBenchmark(ABC):
         - `_fewshot_template: str`: Template for fewshot examples.
         - `_fewshot: str`: Formatted fewshot examples.
         - `_shuffled_indices: list[int]`: Shuffled indices of samples.
+        - `_template_name: str`: Name of the template used.
         """
 
         # Set the benchmark's configuration
@@ -93,6 +94,7 @@ class BaseBenchmark(ABC):
         
     def _set_templates(self, template_name: str):
         """Set the question and fewshot templates for the benchmark."""
+        self._template_name = template_name
         template_cls = getattr(templates, template_name)
         if self._num_fewshot > 0:
             self._question_template: str = template_cls.QUESTION
@@ -148,6 +150,14 @@ class BaseBenchmark(ABC):
         db.add_doc(METADATA, BENCHMARK, self.hashval,
                    self.doc.to_json())
         db.add_doc(METADATA, MODEL, model.hashval, model.config)
+
+        # If model is a chat model, check if a chat template is used
+        model_is_chat = model.config.get('chat', False)
+        template_is_chat = self._template_name.lower().startswith('chat')
+        if model_is_chat and not template_is_chat:
+            logger.warning('The model is a chat model but the template %s '
+                           'is not a chat template. This may lead to '
+                           'unexpected results.', self._template_name)
 
         # Run the benchmark
         pbar = tqdm(self.sample_generator, total=self.total_questions,

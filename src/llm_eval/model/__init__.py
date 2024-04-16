@@ -3,7 +3,7 @@
 import logging
 logger = logging.getLogger('model')
 
-from .base_model import BaseModel, DummyModel
+from .base_model import BaseModel, DummyModel, ConstantModel
 from .hf_model import (FalconModel, GemmaModel, LlamaModel, MistralModel,
                        OlmoModel, Phi2Model, VicunaModel, ZephyrModel)
 from .human_model import HumanModel
@@ -13,6 +13,7 @@ from .anthropic_model import AnthropicModel
 
 classes = {
     'DummyModel': DummyModel,
+    'ConstantModel': ConstantModel,
     'FalconModel': FalconModel,
     'GemmaModel': GemmaModel,
     'LlamaModel': LlamaModel,
