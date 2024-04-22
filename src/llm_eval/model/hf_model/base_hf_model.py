@@ -29,15 +29,20 @@ class BaseHFModel(BaseModel):
         
         self._doc = InfoDoc(**model_config)
 
-    def _predict(self, prompt: str) -> str:
+    def _predict(self, prompt: str, chat:bool = None) -> str:
+        chat = self._config.get('chat', False) if chat is None else chat
+        if chat:
+            messages = [{'role': 'user', 'content': prompt}]
+            prompt = self.pipeline.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True)
+
         sequences = self.pipeline(
             prompt,
             eos_token_id=self.tokenizer.eos_token_id,
+            pad_token_id=self.tokenizer.pad_token_id,
             max_new_tokens=self._config.get('max_new_tokens', 32))
-        response = sequences[0]['generated_text']
-        if response.startswith(prompt):
-            response = response[len(prompt):]
-        return response.strip()
+        response: str = sequences[0]['generated_text']
+        return response.lstrip(prompt).strip()
 
     @property
     def config(self) -> dict:

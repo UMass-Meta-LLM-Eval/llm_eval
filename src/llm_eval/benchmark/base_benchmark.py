@@ -202,7 +202,7 @@ class BaseBenchmark(ABC):
         # Run the evaluation
         pbar = tqdm(self.sample_generator, total=self.total_questions,
                     file=self._tqdm_file, mininterval=60,
-                    desc=f'Benchmarking {self.BM_NAME}')
+                    desc=f'Evaluating {self.BM_NAME}')
 
         for (question, acceptable_answers) in pbar:
 
