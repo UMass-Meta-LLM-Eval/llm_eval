@@ -1,5 +1,3 @@
-from textwrap import dedent
-
 from .base_evaluator import BaseEvaluator
 from .classic_evaluator import ExactMatchEvaluator
 from ..helpers import InfoDoc
@@ -65,3 +63,7 @@ class LLMEvaluator(BaseEvaluator):
     @property
     def hashval(self):
         return self._doc.doc_id
+    
+    def exit(self):
+        del self._model
+        super().exit()
