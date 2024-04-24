@@ -150,6 +150,8 @@ def main():
                         help='Config for both benchmark and evaluation')
     parser.add_argument('--json-db', action='store_true',
                         help='Use JSON database instead of MongoDB')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Increase verbosity in interactive mode')
     args = parser.parse_args()
 
     # Override benchmark and evaluation config if combined config is provided
@@ -160,10 +162,19 @@ def main():
         args.benchmark_config = args.benchmark_eval
         args.eval_config = args.benchmark_eval
 
+    # Create the job ID
+    if args.job_id:
+        job_id = f'BATCH_{args.job_id}'
+        logging_type = 'batch'
+    else:
+        job_id = create_job_id()
+        logging_type = 'interactive-verbose' if args.verbose else 'interactive'
+
     # Set up logging
-    logging_config = load_logging_cfg('default')
+    logging_config = load_logging_cfg(logging_type)
     logging.config.dictConfig(logging_config)
-    
+    logger.log(logging_constants.UPDATE, 'Logging with configuration: %s',
+               logging_type)
 
     # Create the database
     if args.json_db:
@@ -173,11 +184,7 @@ def main():
         db = MongoDB({'uri': os.getenv('MONGODB_URI')})
         logger.log(logging_constants.UPDATE, 'MongoDB initialized')
 
-    # Create the job ID and log the job
-    if args.job_id:
-        job_id = f'BATCH_{args.job_id}'
-    else:
-        job_id = create_job_id()
+    # Log the job start
     logger.info(f'Starting job: {job_id}')
     log_config(db, job_id, args.benchmark_config, args.eval_config)
 

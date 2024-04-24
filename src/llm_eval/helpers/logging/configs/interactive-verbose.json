@@ -1,0 +1,31 @@
+{
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+      "simple": {
+        "format": "%(asctime)s:%(levelname)8s (%(name)s): %(message)s",
+        "datefmt": "%m/%d/%Y %I:%M:%S %p (%Z)"
+      },
+      "full": {
+        "format": "%(asctime)s:%(name)9s:%(levelname)8s:%(funcName)12s (line %(lineno)3d)::%(message)s",
+        "datefmt": "%Y%m%dT%H-%M-%S%z"
+      }
+    },
+    "handlers": {
+      "stderr": {
+        "class": "logging.StreamHandler",
+        "level": 15,
+        "formatter": "full",
+        "stream": "ext://sys.stderr"
+      }
+    },
+    "loggers": {
+      "root": {
+        "level": "DEBUG",
+        "handlers": [
+          "stdout",
+          "stderr"
+        ]
+      }
+    }
+  }
