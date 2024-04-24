@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-import hashlib
-import json
+from ..helpers.constants.logging import UPDATE
+from . import logger
 
 from ..helpers import InfoDoc
 
@@ -27,6 +27,12 @@ class BaseEvaluator(ABC):
     def hashval(self) -> str:
         """Return the SHA256 hash of the evaluator's configuration as a base64
         string."""
+
+
+    def exit(self):
+        """Perform any necessary cleanup operations."""
+        logger.log(UPDATE, 'Exiting evaluator: `%s`',
+                   self.config.get('name', 'UNKNOWN'))
 
 
 class DummyEvaluator(BaseEvaluator):

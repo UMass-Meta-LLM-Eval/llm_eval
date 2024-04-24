@@ -4,8 +4,7 @@ import logging
 logger = logging.getLogger('model')
 
 from .base_model import BaseModel, DummyModel, ConstantModel
-from .hf_model import (FalconModel, GemmaModel, LlamaModel, MistralModel,
-                       OlmoModel, Phi2Model, VicunaModel, ZephyrModel, BAAIModel)
+from .hf_model import HFModel, LlamaModel, MistralModel, Phi2Model, BAAIModel
 from .human_model import HumanModel
 from .openai_model import OpenAIModel
 from .anthropic_model import AnthropicModel
@@ -13,14 +12,10 @@ from .anthropic_model import AnthropicModel
 classes = {
     'DummyModel': DummyModel,
     'ConstantModel': ConstantModel,
-    'FalconModel': FalconModel,
-    'GemmaModel': GemmaModel,
+    'HFModel': HFModel,
     'LlamaModel': LlamaModel,
     'MistralModel': MistralModel,
-    'OlmoModel': OlmoModel,
     'Phi2Model': Phi2Model,
-    'VicunaModel': VicunaModel,
-    'ZephyrModel': ZephyrModel,
     'HumanModel': HumanModel,
     'OpenAIModel': OpenAIModel,
     'AnthropicModel': AnthropicModel,
@@ -28,8 +23,9 @@ classes = {
     # Add new models here
 }
 
-def create_model(model_config: dict) -> BaseModel:
+def create_model(model_config: dict = None, **kwargs) -> BaseModel:
     """Create a model from a config dictionary."""
+    model_config = kwargs if model_config is None else model_config
     logger.info(f'Creating model of class: {model_config["cls"]}')
     model_cls = classes[model_config['cls']]
     return model_cls(model_config)

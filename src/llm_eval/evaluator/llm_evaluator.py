@@ -1,34 +1,28 @@
-from textwrap import dedent
-
 from .base_evaluator import BaseEvaluator
 from .classic_evaluator import ExactMatchEvaluator
 from ..helpers import InfoDoc
 from ..model import create_model
+from ..helpers.templates.evaluator import llm_evaluator as templates
+from ..helpers.constants.logging import UPDATE
+from . import logger
 
 class LLMEvaluator(BaseEvaluator):
-    TEMPLATE = dedent('''
-    Your task is to look at the following question, and based on the references
-    provided, determine if the model's response is correct or incorrect.
-    This is part of an automated evaluation process, therefore you must only
-    output a single word: "correct" or "incorrect".
-
-    Question:
-    {question}
-
-    References:
-    {references}
-
-    Model Response:
-    {response}
-
-    Evaluation (correct/incorrect):
-    ''').strip()
-    
     def __init__(self, eval_config: dict):
         self._eval_config = eval_config
         self._model = create_model(eval_config['model_config'])
-        if 'template' in eval_config:
-            self.TEMPLATE = dedent(eval_config['template']).strip()
+        
+        # Get the template name from the config
+        template_name = eval_config.get('template', 'DEFAULT').upper()
+        logger.log(UPDATE, 'Template name: %s', template_name)
+
+        # Set the template to the specified template
+        if hasattr(templates, template_name):
+            self.TEMPLATE = getattr(templates, template_name).PROMPT
+        else:
+            logger.log(UPDATE, 'Template `%s` not found. Using default '
+                       'template.', template_name)
+            self.TEMPLATE = templates.DEFAULT.PROMPT
+
         self._exact_match_evaluator = ExactMatchEvaluator({})
         self._doc = InfoDoc(**eval_config)
 
@@ -69,3 +63,7 @@ class LLMEvaluator(BaseEvaluator):
     @property
     def hashval(self):
         return self._doc.doc_id
+    
+    def exit(self):
+        del self._model
+        super().exit()
