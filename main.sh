@@ -27,4 +27,9 @@ echo "Running main.py"
 python main.py "$@" -j ${SLURM_JOBID}
 
 # Done
-echo "Job complete"
+exit_code=$?
+if [ $exit_code -eq 0 ]; then
+    echo "Job completed successfully"
+else
+    echo "Job failed with exit code $exit_code"
+fi
