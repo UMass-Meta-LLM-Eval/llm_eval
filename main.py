@@ -1,7 +1,6 @@
 from argparse import ArgumentParser
 from itertools import product
 import gc
-import json
 import os
 import sys
 import logging
