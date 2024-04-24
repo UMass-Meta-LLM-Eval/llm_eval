@@ -1,3 +1,8 @@
+"""Wrappers for the evaluators."""
+
+import logging
+logger = logging.getLogger('evaluator')
+
 from .base_evaluator import BaseEvaluator, DummyEvaluator
 from .classic_evaluator import (ExactMatchEvaluator, ContainsMatchEvaluator,
                                 ContainsWordsEvaluator)
