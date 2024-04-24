@@ -6,3 +6,4 @@ from .olmo_model import OlmoModel
 from .phi2_model import Phi2Model
 from .vicuna_model import VicunaModel
 from .zephyr_model import ZephyrModel
+from .judge_lm import JudgeLM
