@@ -5,7 +5,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 from ...helpers.documents import InfoDoc
 
-class JudgeLM(BaseHFModel):
+class BAAIModel(BaseHFModel):
     HF_ORG_NAME = 'BAAI'
 
     def __init__(self, model_config: dict):

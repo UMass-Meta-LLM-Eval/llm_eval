@@ -5,7 +5,7 @@ logger = logging.getLogger('model')
 
 from .base_model import BaseModel, DummyModel, ConstantModel
 from .hf_model import (FalconModel, GemmaModel, LlamaModel, MistralModel,
-                       OlmoModel, Phi2Model, VicunaModel, ZephyrModel, JudgeLM)
+                       OlmoModel, Phi2Model, VicunaModel, ZephyrModel, BAAIModel)
 from .human_model import HumanModel
 from .openai_model import OpenAIModel
 from .anthropic_model import AnthropicModel
@@ -24,7 +24,7 @@ classes = {
     'HumanModel': HumanModel,
     'OpenAIModel': OpenAIModel,
     'AnthropicModel': AnthropicModel,
-    'JudgeLM': JudgeLM,
+    'BAAIModel': BAAIModel,
     # Add new models here
 }
 
