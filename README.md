@@ -130,7 +130,7 @@ python -m src.database.mongodb_test
 
     All the supported models are listed below:
 
-    | **Model**       | **FalconModel**     | **GemmaModel** | **LlamaModel**            | **MistralModel**           | **OlmoModel**    | **Phi2Model** | **VicunaModel** | **ZephyrModel**      | **TBD**           |
+    | **Model**       | **HFModel**         | **HFModel**    | **LlamaModel**            | **MistralModel**           | **HFModel**      | **Phi2Model** | **HFModel**     | **HFModel**          | **HFModel**           |
     |-----------------|---------------------|----------------|---------------------------|----------------------------|------------------|---------------|-----------------|----------------------|-------------------|
     | **Org Name**    | _tiiuae_            | _google_       | _meta-llama_              | _mistralai_                | _allenai_        | _microsoft_   | _lmsys_         | _HuggingFaceH4_      | _Qwen_            |
     | **Base Models** | falcon-7b           | gemma-2b       | Llama-2-7b-hf             | Mistral-7B-v0.1            | OLMo-1B          | phi-2         |                 |                      | Qwen1.5-0.5B      |
