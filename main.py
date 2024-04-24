@@ -1,12 +1,13 @@
 from argparse import ArgumentParser
 from itertools import product
+import gc
 import json
 import os
 import sys
 import logging
 import logging.config
 from datetime import datetime
-from packaging import version as parse_version
+
 from dotenv import load_dotenv
 loaded = load_dotenv()
 if not loaded:
@@ -19,7 +20,8 @@ from llm_eval import create_evaluator
 from llm_eval import create_model
 from llm_eval.database import BaseDatabase, JSONDatabase, MongoDB
 from llm_eval.helpers import InfoDoc
-from llm_eval.helpers.misc import create_job_id
+from llm_eval.helpers.misc import (create_job_id, load_config, log_config,
+                                   validate_config)
 from llm_eval.helpers.logging import load_logging_cfg
 from llm_eval.helpers.constants import logging as logging_constants
 import torch
@@ -32,6 +34,7 @@ logger = logging.getLogger('llm_eval')
 
 def clear_gpu():
     torch.cuda.empty_cache()
+    gc.collect()
     logger.info('GPU Allocated Memory: '
                 f'{torch.cuda.memory_allocated()/1024**3:.2f} GB')
 
@@ -80,57 +83,6 @@ def inspect(db: BaseDatabase, config: dict, markdown: bool):
         benchmark = create_benchmark(bm_cfg)
         model_hash = InfoDoc(**model_cfg).doc_id
         benchmark.inspect_results(db, model_hash, markdown=markdown)
-
-
-def load_config(cfg_path) -> dict:
-    with open(f'configs/{cfg_path}.json') as f:
-        cfg = json.load(f)
-    return cfg
-
-
-def validate_config(cfg_path):
-    cfg = load_config(cfg_path)
-
-    version: str = cfg.get('metadata', {}).get('version')
-    if version is None:
-        logger.warning('No version specified in config file')
-        return
-
-    src_version = llm_eval.__version__
-    
-    ver_src = src_version.lstrip('v')
-    ver_src_major = src_version.lstrip('v').split('.')[0]
-    ver_cfg = version.lstrip('v')
-    ver_cfg_major = version.lstrip('v').split('.')[0]
-
-    valid = (ver_cfg_major == ver_src_major) and \
-        (parse_version.parse(ver_src) >= parse_version.parse(ver_cfg))
-    
-    if not valid:
-        logger.error(f'Config file version: "{version}" is incompatible '
-                       f'with source version: "{src_version}". This can '
-                       'lead to unexpected behavior.')
-    else:
-        logger.info(f'Config file version: "{version}" is compatible '
-                    f'with source version: "{src_version}".')
-
-
-def log_config(db, job_id, bm_cfg, eval_cfg):
-    curr_dt_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S%z')
-    doc = {
-        'job_id': job_id,
-        'status': 'running',
-        'start_time': curr_dt_str,
-        'current_time': curr_dt_str}
-    if bm_cfg:
-        benchmark = load_config(bm_cfg)
-        benchmark['filename'] = bm_cfg
-        doc['benchmark'] = benchmark
-    if eval_cfg:
-        evaluator = load_config(eval_cfg)
-        evaluator['filename'] = eval_cfg
-        doc['evaluator'] = evaluator
-    db.add_doc('metadata', 'jobs', job_id, doc)
 
 
 def main():
@@ -191,7 +143,7 @@ def main():
     # Run the benchmark
     if args.benchmark_config:
         logger.info('Running benchmark')
-        validate_config(args.benchmark_config)
+        validate_config(args.benchmark_config, llm_eval.__version__)
         benchmark(db, load_config(args.benchmark_config))
     else:
         logger.info('No benchmark config provided. Skipped.')
@@ -199,7 +151,7 @@ def main():
     # Evaluate the results
     if args.eval_config:
         logger.info('Evaluating results')
-        validate_config(args.eval_config)
+        validate_config(args.eval_config, llm_eval.__version__)
         evaluate(db, load_config(args.eval_config))
     else:
         logger.info('No evaluation config provided. Skipped.')
@@ -207,7 +159,7 @@ def main():
     # Inspect the results
     if args.inspect_config:
         logger.info('Inspecting results')
-        validate_config(args.inspect_config)
+        validate_config(args.inspect_config, llm_eval.__version__)
         inspect(db, load_config(args.inspect_config), args.markdown)
     else:
         logger.info('No inspect config provided. Skipped.')
