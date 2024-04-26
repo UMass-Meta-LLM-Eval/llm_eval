@@ -4,6 +4,7 @@ from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 
 from .base_model import BaseModel
 from ..helpers.documents import InfoDoc
+from ..helpers.templates.model import load_template
 
 class BaseHFModel(BaseModel):
     """Base class for all HuggingFace models."""
@@ -22,13 +23,15 @@ class BaseHFModel(BaseModel):
             model_name = f'{self.HF_ORG_NAME}/{model_name}'
 
         self.tokenizer = AutoTokenizer.from_pretrained(
-            model_name, token=os.getenv('HF_TOKEN'))
+            model_name, token=os.getenv('HF_TOKEN'),
+            trust_remote_code=True)
         self.pipeline = pipeline('text-generation',
                                   model=model_name,
                                   tokenizer=self.tokenizer,
                                   torch_dtype=torch.float16,
                                   device_map='auto',
-                                  token=os.getenv('HF_TOKEN'))
+                                  token=os.getenv('HF_TOKEN'),
+                                  trust_remote_code=True)
         
         self._terminators = self.tokenizer.eos_token_id
         
@@ -61,6 +64,7 @@ class BaseHFModel(BaseModel):
 
 
 class HFModel(BaseHFModel):
+
     """Generic class for loading a HuggingFace model that does not require
     any special code.
     
@@ -88,12 +92,10 @@ class MistralModel(BaseHFModel):
 class Phi2Model(BaseHFModel):
     HF_ORG_NAME = 'microsoft'
 
-    def _predict(self, prompt: str) -> str:
-        if self._config.get('chat', False):
-            prompt = f'Instruct: {prompt}\nOutput:'
+    def __init__(self, model_config: dict):
+        raise ValueError('Phi2Model is not working correctly in this '
+                         'version of the code.')
         
-        return super()._predict(prompt)
-
 class BAAIModel(BaseHFModel):
     HF_ORG_NAME = 'BAAI'
 

@@ -225,13 +225,19 @@ class BaseBenchmark(ABC):
             # Otherwise, evaluate the prediction and store the result
             else:
                 result, info = evaluator.evaluate(question, prediction,
-                                                  acceptable_answers)
-                db.update_doc(BENCHMARK, self.BM_NAME, key,
-                              f'evaluation.{evaluator.hashval}',
-                              {'result': result, 'info': info})
-                
+                                                  acceptable_answers,
+                                                  doc=doc, db=db,
+                                                  bm_name=self.BM_NAME)
+                if result is not None:
+                    # Result can be None in case of Multi-Human Evaluator
+                    # because it stores its results into the `info` dicts
+                    # of other evals
+                    db.update_doc(BENCHMARK, self.BM_NAME, key,
+                                f'evaluation.{evaluator.hashval}',
+                                {'result': result, 'info': info})
+
             # Update the evaluation statistics
-            correct += int(result)
+            correct += 0 if result is None else int(result)
 
         # Return the final score
         return correct / self.total_questions

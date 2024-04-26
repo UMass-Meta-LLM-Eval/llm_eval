@@ -28,7 +28,6 @@ class BaseEvaluator(ABC):
         """Return the SHA256 hash of the evaluator's configuration as a base64
         string."""
 
-
     def exit(self):
         """Perform any necessary cleanup operations."""
         logger.log(UPDATE, 'Exiting evaluator: `%s`',
