@@ -23,7 +23,6 @@
       "root": {
         "level": "DEBUG",
         "handlers": [
-          "stdout",
           "stderr"
         ]
       }
