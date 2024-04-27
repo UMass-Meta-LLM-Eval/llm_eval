@@ -3,6 +3,8 @@ from typing import Generator as Gen
 
 from .base_benchmark import BaseBenchmark
 from ..helpers import find_acceptable_answers_triviaqa
+from ..helpers.constants.logging import UPDATE
+from . import logger
 
 class TriviaQABenchmark(BaseBenchmark):
     BM_NAME = 'TriviaQA'
@@ -12,6 +14,8 @@ class TriviaQABenchmark(BaseBenchmark):
         self._dataset = dataset['validation']
         self._training_data = dataset['train']
         self._max_references = bm_config.get('max_references', 10)
+        logger.log(UPDATE, 'Setting max reference count: %d',
+                   self._max_references)
         super().__init__(bm_config)
 
     @property
