@@ -43,29 +43,29 @@ class LLMEvaluator(BaseEvaluator):
         prompt = self._format_prompt(question, references, response)
         evaluation = self._model.predict(prompt).lower().strip()
         if evaluation.startswith('maybe correct'):
-            confidence = False
+            confident = False
             ev = True
             parsed_successfully = True
         elif evaluation.startswith('maybe incorrect'):
-            confidence = False
+            confident = False
             ev = False
             parsed_successfully = True
         elif evaluation.startswith('correct'):
-            confidence = True
+            confident = True
             ev = True
             parsed_successfully = True
         elif evaluation.startswith('incorrect'):
-            confidence = True
+            confident = True
             ev = False
             parsed_successfully = True
         else:
-            confidence = True
+            confident = None
             ev = False
             parsed_successfully = False
         return ev, {'evaluation': evaluation,
                     'parsed_successfully': parsed_successfully,
                     'exact_match': is_exact_match,
-                    'confidence': confidence}
+                    'confident': confident}
 
     @property
     def config(self):

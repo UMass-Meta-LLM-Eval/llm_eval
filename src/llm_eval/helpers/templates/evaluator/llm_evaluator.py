@@ -28,7 +28,30 @@ class HUMAN_GUIDELINES:
     3. Answers with unnecessary verbosity but correct answers should be marked correct (E.g. "Thanks for asking this question! The correct answer is: ...)
     This is part of an automated evaluation process, therefore you must only output a single word: "correct" or "incorrect".
     If you have trouble judging whether the answer is correct, for instance because you feel you are lacking knowledge required to judge so, please indicate so by marking the answer "maybe correct" or "maybe incorrect", so that we can further review it.
-                         
+                                            
+    Question:
+    {question}
+
+    References:
+    {references}
+
+    Model Response:
+    {response}
+
+    Evaluation (correct/incorrect):
+    ''').strip()
+
+
+class HUMAN_GUIDELINES_V2:
+    PROMPT: str = dedent('''
+    Review the Question and Examine the Reference: Carefully read and understand the question. Carefully read each of the reference provided for the question:
+    Evaluate the LLM Response based on guidelines (1-4): 
+    1. Given the model response, only consider the part(s) of the response answering the question, and ignore any extra text.
+    2. When evaluating the language model's answer, evaluate True if it matches with at least one of the provided references otherwise False.
+    3. An answer and reference pair is considered a match if they are semantically equivalent given the context of the question. This determination should not require world knowledge from the human, and if it does, consider it not a match. The answer must contain all the information of the reference for it to be considered a match.
+    4. Considering there might be multiple correct answers, each answer must match with at least one reference for the response to be considered correct overall.
+    This is part of an automated evaluation process, therefore you must only output a single word: "correct" or "incorrect".
+                                         
     Question:
     {question}
 
