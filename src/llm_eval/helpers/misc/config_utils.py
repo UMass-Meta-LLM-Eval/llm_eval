@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import json
 from packaging import version as parse_version
 
