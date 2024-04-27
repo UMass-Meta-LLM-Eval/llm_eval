@@ -6,7 +6,7 @@ logger = logging.getLogger('evaluator')
 from .base_evaluator import BaseEvaluator, DummyEvaluator
 from .classic_evaluator import (ExactMatchEvaluator, ContainsMatchEvaluator,
                                 ContainsWordsEvaluator)
-from .human_evaluator import HumanEvaluator
+from .human_evaluator import HumanEvaluator, MultiHumanEvaluator
 from .llm_evaluator import LLMEvaluator
 from .hf_evaluator import BERTEvaluator
 
@@ -18,6 +18,7 @@ classes = {
     'HumanEvaluator': HumanEvaluator,
     'LLMEvaluator': LLMEvaluator,
     'BERTEvaluator': BERTEvaluator,
+    'MultiHumanEvaluator': MultiHumanEvaluator,
     # Add new evaluators here
 }
 

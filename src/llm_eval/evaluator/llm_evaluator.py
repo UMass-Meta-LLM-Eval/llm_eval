@@ -6,6 +6,7 @@ from ..helpers.templates.evaluator import llm_evaluator as templates
 from ..helpers.constants.logging import UPDATE
 from . import logger
 
+
 class LLMEvaluator(BaseEvaluator):
     def __init__(self, eval_config: dict):
         self._eval_config = eval_config
