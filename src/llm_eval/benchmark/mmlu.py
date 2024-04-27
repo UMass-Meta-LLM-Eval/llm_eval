@@ -53,13 +53,13 @@ class MMLUBenchmark(BaseBenchmark):
         return [label, option, f'{label}: {option}']
 
     @property
-    def sample_generator(self) -> Gen[tuple[str, list[str]], None, None]:
+    def sample_generator(self) -> Gen[tuple[str, list[str], dict], None, None]:
         for i in self._shuffled_indices:
             row = self._dataset[int(i)]
             question = self._create_question(row['input'], row['A'], row['B'],
                                              row['C'], row['D'])
             acceptable_answers = self._get_acceptable_answers(row)
-            yield question, acceptable_answers
+            yield question, acceptable_answers, {}
 
     @property
     def fewshot_generator(self) -> Gen[tuple[str, str], None, None]:
