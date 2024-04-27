@@ -4,7 +4,6 @@ from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 
 from .base_model import BaseModel
 from ..helpers.documents import InfoDoc
-from ..helpers.templates.model import load_template
 
 class BaseHFModel(BaseModel):
     """Base class for all HuggingFace models."""
