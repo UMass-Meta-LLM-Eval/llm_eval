@@ -34,13 +34,10 @@ class LLMEvaluator(BaseEvaluator):
             response=response)
 
     def evaluate(self, question, response, references, **kwargs):
-        # If the response is an exact match, return True
+        # Check if the response is an exact match
         is_exact_match, _ = self._exact_match_evaluator.evaluate(question,
                                                                  response,
                                                                  references)
-        if is_exact_match:
-            return True, {'evaluation': 'correct',
-                          'parsed_successfully': 'N/A'}
 
         # Provide the llm with the question, references, and response
         prompt = self._format_prompt(question, references, response)
@@ -55,7 +52,8 @@ class LLMEvaluator(BaseEvaluator):
             ev = False
             parsed_successfully = False
         return ev, {'evaluation': evaluation,
-                    'parsed_successfully': parsed_successfully}
+                    'parsed_successfully': parsed_successfully,
+                    'exact_match': is_exact_match}
 
     @property
     def config(self):

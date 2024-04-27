@@ -34,7 +34,8 @@ def _get_human_eval(question, response, references) -> tuple[bool, dict]:
 
     # Return the result
     success = user_input in ['yy','y', 'y?']
-    info = {'confident': user_input in ['yy','nn', 'y', 'n']}
+    info = {'confident': user_input in ['yy','nn', 'y', 'n'],
+            'exact_match': False}
     return success, info
 
 
