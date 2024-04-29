@@ -13,10 +13,10 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
         super().__init__(bm_config)
 
     @property
-    def sample_generator(self) -> Gen[tuple[str, list[str]], None, None]:
+    def sample_generator(self) -> Gen[tuple[str, list[str], dict], None, None]:
         for i in self._shuffled_indices:
             row = self._dataset[int(i)]
-            yield row['question'], row['answer']
+            yield row['question'], row['answer'], {}
 
     @property
     def fewshot_generator(self) -> Gen[tuple[str, str], None, None]:

@@ -10,13 +10,15 @@ from ...helpers.templates.inspection import INSPECT_CLI, INSPECT_MD
 
 class BenchmarkDoc(BaseDoc):
     def __init__(self, bm_hash: str, model_hash: str, question_hash: str,
-                 prompt: str, response: str = None, evaluation: dict = None):
+                 prompt: str, response: str = None, evaluation: dict = None,
+                 **kwargs):
         self.bm_hash = bm_hash
         self.model_hash = model_hash
         self.question_hash = question_hash
         self.prompt = prompt
         self.response = response
         self.evaluation = {} if evaluation is None else evaluation
+        self.extra = kwargs
 
     @property
     def prompt_b64(self) -> str:
@@ -41,7 +43,8 @@ class BenchmarkDoc(BaseDoc):
             'question': self.question_hash,
             'prompt': self.prompt_b64,
             'response': self.response_b64,
-            'evaluation': self.evaluation}
+            'evaluation': self.evaluation,
+            'extra': self.extra}
 
     @classmethod
     def from_json(cls, json_obj: dict):
@@ -49,7 +52,8 @@ class BenchmarkDoc(BaseDoc):
                    json_obj['question'],
                    cls.b64_str_to_str(json_obj['prompt']),
                    cls.b64_str_to_str(json_obj['response']),
-                   json_obj.get('evaluation'))
+                   json_obj.get('evaluation'),
+                   **json_obj.get('extra', {}))
 
     def _create_cli_str(self, benchmark_name: str, model_name: str,
                         data: str, eval_names: dict) -> str:

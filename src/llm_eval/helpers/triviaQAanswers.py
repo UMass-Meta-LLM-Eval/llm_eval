@@ -4,6 +4,6 @@ def find_acceptable_answers_triviaqa(doc):
     aliases = doc['answer'].get('aliases', []) 
     acceptable_answers.extend(aliases)
 
-    acceptable_answers = acceptable_answers[:10]
-
+    # Returning all references here and then filtering them (if needed)
+    # in the benchmark class
     return acceptable_answers

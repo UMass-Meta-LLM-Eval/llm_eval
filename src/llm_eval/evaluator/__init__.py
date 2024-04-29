@@ -1,4 +1,4 @@
-"""Evaluator module for benchmarking language models."""
+"""Wrappers for the evaluators."""
 
 import logging
 logger = logging.getLogger('evaluator')
@@ -6,7 +6,7 @@ logger = logging.getLogger('evaluator')
 from .base_evaluator import BaseEvaluator, DummyEvaluator
 from .classic_evaluator import (ExactMatchEvaluator, ContainsMatchEvaluator,
                                 ContainsWordsEvaluator)
-from .human_evaluator import HumanEvaluator
+from .human_evaluator import HumanEvaluator, MultiHumanEvaluator
 from .llm_evaluator import LLMEvaluator
 from .hf_evaluator import BERTEvaluator
 from .staged_llm_evaluator import StagedLLMEvaluator
@@ -19,6 +19,7 @@ classes = {
     'HumanEvaluator': HumanEvaluator,
     'LLMEvaluator': LLMEvaluator,
     'BERTEvaluator': BERTEvaluator,
+    'MultiHumanEvaluator': MultiHumanEvaluator,
     'StagedLLMEvaluator': StagedLLMEvaluator,
     # Add new evaluators here
 }
