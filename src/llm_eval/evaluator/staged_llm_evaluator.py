@@ -7,6 +7,7 @@ from ..helpers import InfoDoc
 from ..model import create_model
 from ..helpers.templates.evaluator import staged_llm_evaluator as templates
 from ..helpers.constants.logging import UPDATE
+from ..helpers.misc import extract_tag
 from . import logger
 
 class StagedLLMEvaluator(BaseEvaluator):
@@ -46,31 +47,13 @@ class StagedLLMEvaluator(BaseEvaluator):
             logger.info('Set `self.%s` to `%s.%s`',
                         set_arg, template_name, arg)
 
-    def _parse(self, response: str, tag: str, multi_ok: bool = False):
-        pattern = f'<{tag}>(.*?)</{tag}>'
-        matches = re.findall(pattern, response, re.DOTALL)
-
-        # No matches found
-        if len(matches) == 0:
-            return None
-        
-        # Return all matches if multi_ok is True
-        if multi_ok:
-            return matches
-        
-        # Return the first match if multi_ok is False
-        if len(matches) > 1:
-            logger.warning('Multiple matches found for tag `%s` in response. '
-                           'Using the first match.', tag)
-        return matches[0]
-
     def _extract(self, question, references, response) -> tuple[str, dict]:
         """Extract the actual answer from the response."""
         prompt = self.EXTRACT_PROMPT.format(question=question,
                                               references='\n'.join(references),
                                               response=response)
         eval_response = self._model.predict(prompt)
-        extracted = self._parse(eval_response, self.EXTRACT_TAG)
+        extracted = extract_tag(eval_response, self.EXTRACT_TAG)
         extracted = extracted if extracted is not None else ''
         return extracted.strip(), {'extract_response': eval_response}
 
@@ -83,7 +66,7 @@ class StagedLLMEvaluator(BaseEvaluator):
                                             references='\n'.join(references),
                                             response=response)
         eval_response = self._model.predict(prompt)
-        split = self._parse(eval_response, self.SPLIT_TAG,
+        split = extract_tag(eval_response, self.SPLIT_TAG,
                             multi_ok=True)
         split = [] if split is None else split
         split = [s.strip() for s in split]
