@@ -7,7 +7,7 @@ from .base_evaluator import BaseEvaluator, DummyEvaluator
 from .classic_evaluator import (ExactMatchEvaluator, ContainsMatchEvaluator,
                                 ContainsWordsEvaluator)
 from .human_evaluator import HumanEvaluator, MultiHumanEvaluator
-from .llm_evaluator import LLMEvaluator
+from .llm_evaluator import LLMEvaluator, LLMExtractEvaluator
 from .hf_evaluator import BERTEvaluator
 from .staged_llm_evaluator import StagedLLMEvaluator
 
@@ -21,6 +21,7 @@ classes = {
     'BERTEvaluator': BERTEvaluator,
     'MultiHumanEvaluator': MultiHumanEvaluator,
     'StagedLLMEvaluator': StagedLLMEvaluator,
+    'LLMExtractEvaluator': LLMExtractEvaluator,
     # Add new evaluators here
 }
 

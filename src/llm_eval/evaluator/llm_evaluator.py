@@ -4,6 +4,7 @@ from ..helpers import InfoDoc
 from ..model import create_model
 from ..helpers.templates.evaluator import llm_evaluator as templates
 from ..helpers.constants.logging import UPDATE
+from ..helpers.misc import extract_from_tag
 from . import logger
 
 
@@ -14,15 +15,17 @@ class LLMEvaluator(BaseEvaluator):
         
         # Get the template name from the config
         template_name = eval_config.get('template', 'DEFAULT').upper()
-        logger.log(UPDATE, 'Template name: %s', template_name)
+        logger.log(UPDATE, 'Template name for LLM Evaluator: %s',
+                   template_name)
 
         # Set the template to the specified template
-        if hasattr(templates, template_name):
+        try:
             self.TEMPLATE = getattr(templates, template_name).PROMPT
-        else:
-            logger.log(UPDATE, 'Template `%s` not found. Using default '
-                       'template.', template_name)
-            self.TEMPLATE = templates.DEFAULT.PROMPT
+        except AttributeError as e:
+            logger.error('Template `%s` not found for LLM evaluator.',
+                         template_name)
+            raise ValueError('Invalid template name for LLM Evaluator: '
+                             f'{template_name}') from e
 
         self._exact_match_evaluator = ExactMatchEvaluator({})
         self._doc = InfoDoc(**eval_config)
@@ -42,30 +45,24 @@ class LLMEvaluator(BaseEvaluator):
         # Provide the llm with the question, references, and response
         prompt = self._format_prompt(question, references, response)
         evaluation = self._model.predict(prompt).lower().strip()
-        if evaluation.startswith('maybe correct'):
-            confident = False
-            ev = True
-            parsed_successfully = True
-        elif evaluation.startswith('maybe incorrect'):
-            confident = False
-            ev = False
-            parsed_successfully = True
-        elif evaluation.startswith('correct'):
-            confident = True
-            ev = True
-            parsed_successfully = True
-        elif evaluation.startswith('incorrect'):
-            confident = True
-            ev = False
-            parsed_successfully = True
-        else:
-            confident = None
-            ev = False
-            parsed_successfully = False
+        ev, confident, parsed_successfully = self._parse_eval(evaluation)
         return ev, {'evaluation': evaluation,
                     'parsed_successfully': parsed_successfully,
                     'exact_match': is_exact_match,
                     'confident': confident}
+
+    def _parse_eval(self, eval_str: str) -> tuple[bool, bool, bool]:
+        if eval_str.startswith('correct'):
+            ev, confident, parsed_successfully = True, True, True
+        elif eval_str.startswith('incorrect'):
+            ev, confident, parsed_successfully = False, True, True
+        elif eval_str.startswith('maybe correct'):
+            ev, confident, parsed_successfully = True, False, True
+        elif eval_str.startswith('maybe incorrect'):
+            ev, confident, parsed_successfully = False, False, True
+        else:
+            ev, confident, parsed_successfully = False, None, False
+        return ev, confident, parsed_successfully
 
     @property
     def config(self):
@@ -74,7 +71,27 @@ class LLMEvaluator(BaseEvaluator):
     @property
     def hashval(self):
         return self._doc.doc_id
-    
+
     def exit(self):
         del self._model
         super().exit()
+
+
+class LLMExtractEvaluator(LLMEvaluator):
+    def __init__(self, eval_config: dict):
+        super().__init__(eval_config)
+        self._extract_tag = eval_config['eval_tag']
+
+    def _format_prompt(self, question, references, response):
+        return self.TEMPLATE.format(
+            question=question,
+            references='\n'.join(references),
+            response=response,
+            extract_tag=self._extract_tag)
+    
+    def _parse_eval(self, eval_str: str) -> tuple[bool, bool, bool]:
+        extracted = extract_from_tag(eval_str, self._extract_tag)
+        if extracted is not None:
+            eval_str = extracted
+
+        return super()._parse_eval(eval_str)
