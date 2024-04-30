@@ -72,7 +72,7 @@ def evaluate(db: BaseDatabase, config: dict):
                           f'evaluator `{evaluator_cfg.get("name", "unknown")}`, '
                           f'benchmark `{bm_cfg.get("name", "unknown")}`, '
                           f'model `{model_cfg.get("name", "unknown")}`: '
-                          f'{results:.2f}')
+                          f'{results*100:.2f}%')
         del evaluator
         clear_gpu()
 
