@@ -7,7 +7,7 @@ from ..helpers import InfoDoc
 from ..model import create_model
 from ..helpers.templates.evaluator import staged_llm_evaluator as templates
 from ..helpers.constants.logging import UPDATE
-from ..helpers.misc import extract_tag
+from ..helpers.misc import extract_from_tag
 from . import logger
 
 class StagedLLMEvaluator(BaseEvaluator):
@@ -53,7 +53,7 @@ class StagedLLMEvaluator(BaseEvaluator):
                                               references='\n'.join(references),
                                               response=response)
         eval_response = self._model.predict(prompt)
-        extracted = extract_tag(eval_response, self.EXTRACT_TAG)
+        extracted = extract_from_tag(eval_response, self.EXTRACT_TAG)
         extracted = extracted if extracted is not None else ''
         return extracted.strip(), {'extract_response': eval_response}
 
@@ -66,7 +66,7 @@ class StagedLLMEvaluator(BaseEvaluator):
                                             references='\n'.join(references),
                                             response=response)
         eval_response = self._model.predict(prompt)
-        split = extract_tag(eval_response, self.SPLIT_TAG,
+        split = extract_from_tag(eval_response, self.SPLIT_TAG,
                             multi_ok=True)
         split = [] if split is None else split
         split = [s.strip() for s in split]
