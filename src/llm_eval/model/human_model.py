@@ -7,7 +7,7 @@ class HumanModel(BaseModel):
         self._config = model_config
         self._doc = InfoDoc(**model_config)
 
-    def _predict(self, prompt: str) -> str:
+    def _predict(self, prompt: str, **kwargs) -> str:
         return input(prompt+'\n').strip()
     
     @property
