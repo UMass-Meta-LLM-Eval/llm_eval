@@ -1,6 +1,6 @@
 from datetime import datetime
 from .. import logger
-from .io import truncate_response, extract_tag
+from .io import truncate_response, extract_from_tag
 from .config_utils import load_config, validate_config, log_config
 
 

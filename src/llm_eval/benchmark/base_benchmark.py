@@ -9,9 +9,11 @@ from ..helpers.constants.db import (DATASETS, BENCHMARK, METADATA, MODEL,
                                     EVALUATOR)
 from ..helpers.constants.logging import UPDATE
 from ..helpers.logging.tqdm_to_logger import TqdmToLogger
-from ..helpers.misc import truncate_response
+from ..helpers.misc import truncate_response, extract_from_tag
 from ..database import BaseDatabase
 from ..evaluator import BaseEvaluator
+from ..helpers.constants.evaluator import TRUNCATE, EXTRACT
+
 from . import logger
 
 class BaseBenchmark(ABC):
@@ -53,7 +55,7 @@ class BaseBenchmark(ABC):
         template_name = self.config.get('template', '').upper()
         if template_name == '':
             logger.warning('Template name not specified. Defaulting to '
-                           'BASE_SIMPLE.')
+                           'BASE_SIMPLE for creating benchmark prompts.')
             template_name = 'BASE_SIMPLE'
         logger.log(UPDATE, 'Using template: %s', template_name)
 
@@ -127,11 +129,20 @@ class BaseBenchmark(ABC):
         return self._question_template.format(question=question,
                                               fewshot=self._fewshot)
     
-    def _parse_response(self, response: str, config: dict) -> str:
+    def _parse_response(self, response: str, truncation_logic: str,
+                        extract_tag: str) -> str:
         """Parse the model's response to the question. This method should
         extract the answer from the model's response, which will then be
         sent to the evaluator."""
-        return truncate_response(config, response)
+        parsed = truncate_response(response, truncation_logic)
+        if extract_tag is not None:
+            extracted = extract_from_tag(parsed, extract_tag)
+            if extracted is None:
+                logger.info('Extraction tag not found in response. Returning '
+                            'the full response.')
+            else:
+                parsed = extracted
+        return parsed
     
     def _validate_num_fewshot(self, num_fewshot: int, n_train: int) -> int:
         """Validate the number of fewshot examples."""
@@ -186,7 +197,7 @@ class BaseBenchmark(ABC):
                 continue
 
             # Otherwise make model prediction and store in the database
-            prediction = model.predict(prompt)
+            prediction = model.predict(prompt, references=acceptable_answers)
             doc.response = prediction
             db.add_doc(BENCHMARK, self.BM_NAME, doc.doc_id, doc.to_json())
 
@@ -198,6 +209,14 @@ class BaseBenchmark(ABC):
 
         # Set up the evaluator run
         db.add_doc(METADATA, EVALUATOR, evaluator.hashval, evaluator.config)
+        truncation_logic = evaluator.config.get(TRUNCATE)
+        if truncation_logic is None:
+            logger.warning('Truncation configuration not found. Using default '
+                           'truncation logic for model output.')
+        extraction_tag = evaluator.config.get(EXTRACT)
+        if extraction_tag is None:
+            logger.warning('Extraction tag not found. No extraction will be '
+                            'performed from model output.')
         correct = 0
 
         # Run the evaluation
@@ -216,7 +235,8 @@ class BaseBenchmark(ABC):
             key = BenchmarkDoc(self.hashval, model_hash, question_hash,
                                prompt).doc_id
             doc = self._get_doc_from_db(db, self.BM_NAME, key)
-            prediction = self._parse_response(doc.response, evaluator.config)
+            prediction = self._parse_response(doc.response, truncation_logic, 
+                                              extraction_tag)
 
             # If eval caching is enabled and evaluation already exists, skip
             if evaluator.config.get('use_cache', True) \
