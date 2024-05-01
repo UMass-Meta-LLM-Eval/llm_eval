@@ -36,8 +36,8 @@ class BaseHFModel(BaseModel):
         
         self._doc = InfoDoc(**model_config)
 
-    def _predict(self, prompt: str, chat:bool = None) -> str:
-        chat = self._config.get('chat', False) if chat is None else chat
+    def _predict(self, prompt: str, **kwargs) -> str:
+        chat = kwargs.get('chat', self._config.get('chat', False))
         if chat:
             messages = [{'role': 'user', 'content': prompt}]
             prompt = self.pipeline.tokenizer.apply_chat_template(

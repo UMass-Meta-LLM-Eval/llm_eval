@@ -14,7 +14,7 @@ class AnthropicModel(BaseModel):
         self._completions_kwargs = self._config.get('completions_kwargs', {})
         self._doc = InfoDoc(**model_config)
 
-    def _predict(self, prompt: str) -> str:
+    def _predict(self, prompt: str, **kwargs) -> str:
         t_start = time.time()
         messages = [{'role': 'user', 'content': prompt}]
         response = self.client.messages.create(

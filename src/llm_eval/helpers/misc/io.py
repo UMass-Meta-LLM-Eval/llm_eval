@@ -3,46 +3,45 @@ import string
 
 from . import logger
 
-def _get_truncation_logic(logic):
-    if not logic or logic == 'newline':
-        return {
-            'until': ['\n']
-        }
-    elif logic == 'skip':
-        return {}
-    elif logic == 'newlinequestion':
-        return {
-            'until': ['\nQ:']
-        }
-    elif logic == 'newlinequestion2':
-        return {
-            'until': ['\nQuestion:']
-        }
-    elif logic == 'eleutherai':
-        return {
+
+TRUNCATION_LOGIC: dict[str, dict] = {
+    'newline': {
+        'until': ['\n']},
+    'skip': {},
+    'newlinequestion': {
+        'until': ['\nQ:']},
+    'newlinequestion2': {
+        'until': ['\nQuestion:']},
+    'eleutherai': {
         'until': ['\n', '.', ','],
         'remove': ['punctuation', 'whitespace'],
         'ignore_regex': ['\\b(?: The the An | A |The | a |an )'],
-        'ignore_case': True
-    }
-    else:
-        raise ValueError('Not a Valid Truncation Logic!')
+        'ignore_case': True}}
+"""Dictionary containing presets for truncation of response strings."""
 
+DEFAULT_TRUNCATION_LOGIC = 'newline'
 
-def truncate_response(config, response) -> str:
+def truncate_response(response, logic) -> str:
     """
     Truncates a response based on the given configuration.
 
     Parameters:
-        config (dict): A dictionary containing truncation configuration.
         response (str): The response string to be truncated.
+        logic (str): The truncation logic to be used.
 
     Returns:
         str: The truncated response string.
     """
-    logic = config.get('truncate', 'newline')
+    if logic is None:
+        logger.warning('Truncation configuration not found. Using default '
+                       'truncation logic: %s', DEFAULT_TRUNCATION_LOGIC)
+        logic = DEFAULT_TRUNCATION_LOGIC
     logger.debug('Truncation Logic: %s', logic)
-    config_trunc = _get_truncation_logic(logic)
+    try:
+        config_trunc = TRUNCATION_LOGIC[logic]
+    except KeyError as e:
+        logger.error('Invalid truncation logic: %s', logic)
+        raise ValueError(f'Could not find truncation logic: {logic}') from e
     
     # Skip Truncation if no configuration provided
     if config_trunc == {}:
@@ -80,3 +79,22 @@ def truncate_response(config, response) -> str:
         response = response.lower()
 
     return response.strip()
+
+
+def extract_from_tag(input_str: str, tag: str, multi_ok: bool = False):
+        pattern = f'<{tag}>(.*?)</{tag}>'
+        matches: list[str] = re.findall(pattern, input_str, re.DOTALL)
+
+        # No matches found
+        if len(matches) == 0:
+            return None
+        
+        # Return all matches if multi_ok is True
+        if multi_ok:
+            return matches
+        
+        # Return the first match if multi_ok is False
+        if len(matches) > 1:
+            logger.warning('Multiple matches found for tag `%s` in response. '
+                           'Returning the first match.', tag)
+        return matches[0]
