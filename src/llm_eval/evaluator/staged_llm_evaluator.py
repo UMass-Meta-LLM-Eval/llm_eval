@@ -11,11 +11,6 @@ from ..helpers.misc import extract_from_tag
 from . import logger
 
 class StagedLLMEvaluator(BaseEvaluator):
-    DEFAULTS = {
-        'extract': 'EXTRACT_DEFAULT',
-        'split': 'SPLIT_DEFAULT',
-        'match': 'MATCH_DEFAULT'}
-
     def __init__(self, eval_config: dict):
         self._eval_config = eval_config
         self._model = create_model(eval_config['model_config'])
@@ -29,17 +24,22 @@ class StagedLLMEvaluator(BaseEvaluator):
         self._doc = InfoDoc(**eval_config)
         
     def _set_template(self, template_type: str):
-        default_template = self.DEFAULTS[template_type]
-        template_name = self._eval_config.get(f'{template_type}_template',
-                                                default_template).upper()
-        logger.log(UPDATE, '%s template name: %s',
-                   template_type, template_name)
-
-        if hasattr(templates, template_name):
+        try:
+            template_name = self._eval_config[f'{template_type}_template'
+                                              ].upper()
+            logger.log(UPDATE, '%s template name for staged LLM evaluator: %s',
+                    template_type, template_name)
             template = getattr(templates, template_name)
-        logger.warning('Template `%s` not found. Using default template: %s.',
-                       template_name, default_template)
-        template = getattr(templates, default_template)
+        except KeyError as e:
+            logger.error('%s template name not provided for '
+                         'staged LLM evaluator.', template_type)
+            raise ValueError(f'{template_type} template name not provided for '
+                             'staged LLM Evaluator.') from e
+        except AttributeError as e:
+            logger.error('Template `%s` not found for staged LLM evaluator.',
+                         template_name)
+            raise ValueError('Invalid template name for staged LLM Evaluator: '
+                             f'{template_name}') from e
 
         for arg in template.ARGS:
             set_arg = f'{template_type}_{arg}'.upper()
