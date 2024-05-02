@@ -57,7 +57,7 @@ class MMLUBenchmark(BaseBenchmark):
         generated = 0
         for i in self._shuffled_indices:
             # Stop if we have generated enough samples
-            if generated >= self._num_samples:
+            if generated >= self.total_questions:
                 break
 
             # Create the question and references
