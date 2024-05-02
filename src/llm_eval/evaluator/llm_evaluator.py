@@ -14,7 +14,12 @@ class LLMEvaluator(BaseEvaluator):
         self._model = create_model(eval_config['model_config'])
         
         # Get the template name from the config
-        template_name = eval_config.get('template', 'DEFAULT').upper()
+        try:
+            template_name = eval_config['template']
+        except KeyError as e:
+            logger.error('Template name not found for LLM evaluator.')
+            raise ValueError('Template name not found for '
+                             'LLM Evaluator.') from e
         logger.log(UPDATE, 'Template name for LLM Evaluator: %s',
                    template_name)
 
@@ -80,7 +85,12 @@ class LLMEvaluator(BaseEvaluator):
 class LLMExtractEvaluator(LLMEvaluator):
     def __init__(self, eval_config: dict):
         super().__init__(eval_config)
-        self._extract_tag = eval_config['eval_tag']
+        try:
+            self._extract_tag = eval_config['eval_tag']
+        except KeyError as e:
+            logger.error('Evaluation tag not found for LLM Extract Evaluator.')
+            raise ValueError('Evaluation tag not found for '
+                             'LLM Extract Evaluator.') from e
 
     def _format_prompt(self, question, references, response):
         return self.TEMPLATE.format(

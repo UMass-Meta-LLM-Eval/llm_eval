@@ -54,11 +54,25 @@ class MMLUBenchmark(BaseBenchmark):
 
     @property
     def sample_generator(self) -> Gen[tuple[str, list[str], dict], None, None]:
+        generated = 0
         for i in self._shuffled_indices:
+            # Stop if we have generated enough samples
+            if generated >= self._num_samples:
+                break
+
+            # Create the question and references
             row = self._dataset[int(i)]
             question = self._create_question(row['input'], row['A'], row['B'],
                                              row['C'], row['D'])
             acceptable_answers = self._get_acceptable_answers(row)
+
+            # Skip this question if there are too many references
+            if (self._max_references > 0) and \
+                (len(acceptable_answers) > self._max_references):
+                continue
+
+            # Update the counter and yield the question-references-extras tuple
+            generated += 1
             yield question, acceptable_answers, {}
 
     @property

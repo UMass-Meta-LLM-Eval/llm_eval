@@ -14,8 +14,22 @@ class NaturalQuestionsBenchmark(BaseBenchmark):
 
     @property
     def sample_generator(self) -> Gen[tuple[str, list[str], dict], None, None]:
+        generated = 0
         for i in self._shuffled_indices:
+            # Stop if we have generated enough samples
+            if generated >= self._num_samples:
+                break
+
+            # Create the question and references
             row = self._dataset[int(i)]
+
+            # Skip this question if there are too many references
+            if (self._max_references > 0) and \
+                (len(row['answer']) > self._max_references):
+                continue
+
+            # Update the counter and yield the question-references-extras tuple
+            generated += 1
             yield row['question'], row['answer'], {}
 
     @property

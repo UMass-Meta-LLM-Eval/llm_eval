@@ -4,6 +4,8 @@ from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 
 from .base_model import BaseModel
 from ..helpers.documents import InfoDoc
+from ..helpers.constants.model import HF_MAX_NEW_TOKENS
+from . import logger
 
 class BaseHFModel(BaseModel):
     """Base class for all HuggingFace models."""
@@ -17,7 +19,12 @@ class BaseHFModel(BaseModel):
     def __init__(self, model_config: dict):
         self._config = model_config
 
-        model_name = self._config['model']
+        try:
+            model_name = self._config['model']
+        except KeyError as e:
+            logger.error('Model name not found for HF Model.')
+            raise ValueError('Model name not found for HF Model.') from e
+
         if '/' not in model_name:
             model_name = f'{self.HF_ORG_NAME}/{model_name}'
 
@@ -47,7 +54,8 @@ class BaseHFModel(BaseModel):
             prompt,
             eos_token_id=self._terminators,
             pad_token_id=self.tokenizer.eos_token_id,
-            max_new_tokens=self._config.get('max_new_tokens', 32),
+            max_new_tokens=self._config.get('max_new_tokens',
+                                            HF_MAX_NEW_TOKENS),
             return_full_text=False)
 
         response: str = sequences[0]['generated_text']
@@ -117,7 +125,8 @@ class BAAIModel(BaseHFModel):
     def _predict(self, prompt: str) -> str:
         sequences = self.pipeline.generate(
             **self.tokenizer(prompt, return_tensors='pt').to('cuda'),
-            max_new_tokens=self._config.get('max_new_tokens', 32))
+            max_new_tokens=self._config.get('max_new_tokens',
+                                            HF_MAX_NEW_TOKENS))
         response = self.tokenizer.decode(sequences[0])
 
         if response.startswith(self.starttoken):

@@ -15,6 +15,7 @@ from ..evaluator import BaseEvaluator
 from ..helpers.constants.evaluator import TRUNCATE, EXTRACT
 
 from . import logger
+from ..evaluator import logger as eval_logger
 
 class BaseBenchmark(ABC):
     def __init__(self, bm_config: dict):
@@ -35,6 +36,7 @@ class BaseBenchmark(ABC):
         - `_fewshot: str`: Formatted fewshot examples.
         - `_shuffled_indices: list[int]`: Shuffled indices of samples.
         - `_template_name: str`: Name of the template used.
+        - `_max_references: int`: Maximum number of allowed references.
         """
 
         # Set the benchmark's configuration
@@ -43,7 +45,8 @@ class BaseBenchmark(ABC):
         # Set the seed
         seed = self.config.get('seed')
         if seed is None:
-            logger.warning('Seed not specified. Defaulting to 0.')
+            logger.warning('Seed not specified for benchmark. '
+                           'Defaulting to 0.')
             seed = 0
         self._seed: int = seed
 
@@ -52,20 +55,27 @@ class BaseBenchmark(ABC):
         self._tqdm_file = TqdmToLogger(logger)
 
         # Load template
-        template_name = self.config.get('template', '').upper()
-        if template_name == '':
-            logger.warning('Template name not specified. Defaulting to '
-                           'BASE_SIMPLE for creating benchmark prompts.')
-            template_name = 'BASE_SIMPLE'
+        try:
+            template_name = self.config['template']
+        except KeyError as e:
+            logger.error('Template name for benchmark not specified in '
+                         'config dictionary.')
+            raise ValueError('Template name not found for benchmark.') from e
         logger.log(UPDATE, 'Using template: %s', template_name)
 
         # Set up fewshot examples
         self._num_fewshot: int = self._config.get('num_fewshot')
         if self._num_fewshot is None:
-            logger.warning('Fewshot examples not specified. Defaulting to 0.')
+            logger.warning('Number of fewshot examples for benchmark not '
+                           'specified. Defaulting to 0.')
             self._num_fewshot = 0
         self._set_templates(template_name)
         self._fewshot = self._create_fewshot_examples()
+
+        # Set the maximum number of allowed references
+        self._max_references: int = bm_config.get('max_references', 10)
+        logger.log(UPDATE, 'Setting max reference count: %d',
+                   self._max_references)
 
         # Compute sample indices
         total, shuffled_indices = self._get_shuffled_indices(
@@ -86,7 +96,7 @@ class BaseBenchmark(ABC):
         if 'num_samples' in self.config:
             total = self.config['num_samples']
             logger.info('Running benchmark on a %d sample subset.', total)
-            shuffled_indices = rng.permutation(dataset_len)[:total].tolist()
+            shuffled_indices = rng.permutation(dataset_len).tolist()
         else:
             logger.info('Running benchmark on the full dataset.')
             total = dataset_len
@@ -209,14 +219,18 @@ class BaseBenchmark(ABC):
 
         # Set up the evaluator run
         db.add_doc(METADATA, EVALUATOR, evaluator.hashval, evaluator.config)
-        truncation_logic = evaluator.config.get(TRUNCATE)
-        if truncation_logic is None:
-            logger.warning('Truncation configuration not found. Using default '
-                           'truncation logic for model output.')
+        try:
+            truncation_logic = evaluator.config[TRUNCATE]
+        except KeyError as e:
+            eval_logger.error('Truncation configuration not found for '
+                              'evaluator.')
+            raise ValueError('Truncation configuration not found for '
+                             'evaluator.') from e
         extraction_tag = evaluator.config.get(EXTRACT)
         if extraction_tag is None:
-            logger.warning('Extraction tag not found. No extraction will be '
-                            'performed from model output.')
+            eval_logger.warning('Extraction tag not found. No extraction '
+                                'will be performed from model output for '
+                                'evaluation')
         correct = 0
 
         # Run the evaluation

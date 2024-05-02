@@ -13,19 +13,28 @@ class TriviaQABenchmark(BaseBenchmark):
         dataset = load_dataset('trivia_qa', bm_config['subset'])
         self._dataset = dataset['validation']
         self._training_data = dataset['train']
-        self._max_references = bm_config.get('max_references', 10)
-        logger.log(UPDATE, 'Setting max reference count: %d',
-                   self._max_references)
         super().__init__(bm_config)
 
     @property
     def sample_generator(self) -> Gen[tuple[str, list[str], dict], None, None]:
+        generated = 0
         for i in self._shuffled_indices:
+            # Stop if we have generated enough samples
+            if generated >= self._num_samples:
+                break
+
+            # Create the question and references
             row = self._dataset[int(i)]
             acceptable_answers = find_acceptable_answers_triviaqa(row)
             extra = {'num_references': len(acceptable_answers)}
-            if self._max_references > 0:
-                acceptable_answers = acceptable_answers[:self._max_references]
+
+            # Skip this question if there are too many references
+            if (self._max_references > 0) and \
+                (len(acceptable_answers) > self._max_references):
+                continue
+
+            # Update the counter and yield the question-references-extras tuple
+            generated += 1
             yield row['question'], acceptable_answers, extra
 
     @property
