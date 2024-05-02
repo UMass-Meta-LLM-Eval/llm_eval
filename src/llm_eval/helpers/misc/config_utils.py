@@ -52,3 +52,11 @@ def log_config(db, job_id, bm_cfg, eval_cfg):
         evaluator['filename'] = eval_cfg
         doc['evaluator'] = evaluator
     db.add_doc('metadata', 'jobs', job_id, doc)
+
+
+def configs_to_jsonl(config_paths: list[str], output_path: str):
+    """Save multiple configuration files to a single JSONL file."""
+    with open(output_path, 'w') as f_out:
+        for path in config_paths:
+            config = load_config(path)
+            f_out.write(json.dumps(config) + '\n')

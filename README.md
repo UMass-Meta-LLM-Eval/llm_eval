@@ -308,7 +308,7 @@ Evaluators have the following attributes:
     * `model` (`Model`): The model to use for generating
     * `template` (`str`): Name of the template to use for creating the prompt
     for the evaluator. Default is `"DEFAULT"`.
-    * truncate` (`str`): The truncation logic to use. Available options are
+    * truncate (`str`): The truncation logic to use. Available options are
     `"newline"`, `"newlinequestion"`,  `"skip"`, and `"eleutherai"`. Default
     is `"newline"`.
     * `eval_tag` (`str`): A tag to identify the evaluation in the output. For
@@ -317,3 +317,18 @@ Evaluators have the following attributes:
     extract `"correct"` as the answer. Useful if the template asks the evalutor
     to wrap its evaluation inside a specified tag. If the `eval_tag` is `None`,
     the raw output is used as the answer. Default is `None`.
+
+# Analysis Scripts
+
+In version 1.7.0, helper functions for analyzing the results of the evaluations
+were added to the `analysis` sub-package. In addition, a new console command
+`llm-analysis` was added to the package.
+
+The command can be run as follows:
+
+```bash
+llm-analysis <func-name> <args> <kwargs>
+```
+
+If you have a previous version of the package installed, you may need to
+uninstall and reinstall the package to get the new console command.

@@ -3,6 +3,7 @@ torch
 transformers 
 accelerate
 datasets
+python-dotenv
 pymongo
 termcolor
 evaluate
@@ -11,3 +12,5 @@ anthropic
 sentencepiece
 bert_score
 overrides
+scikit-learn
+jinja2

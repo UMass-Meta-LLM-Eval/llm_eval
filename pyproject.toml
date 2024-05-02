@@ -11,6 +11,7 @@ dependencies = [
   "transformers",
   "accelerate",
   "datasets",
+  "python-dotenv",
   "pymongo",
   "termcolor",
   "evaluate",
@@ -18,7 +19,9 @@ dependencies = [
   "anthropic",
   "sentencepiece",
   "bert_score",
-  "overrides"
+  "overrides",
+  "scikit-learn",
+  "jinja2"
 ]
 authors = [
   { name="Kartik Choudhary", email="kartikchoudh@umass.edu" },
@@ -33,6 +36,10 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+
+[project.scripts]
+llm-analysis = "llm_eval.scripts:analysis"
+
 [project.urls]
 "Homepage" = "https://github.com/UMass-Meta-LLM-Eval/llm_eval"
 "Bug Tracker" = "https://github.com/UMass-Meta-LLM-Eval/llm_eval/issues"
