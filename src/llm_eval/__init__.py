@@ -1,6 +1,6 @@
 """Evaluation suite for LLMs on Core-Knowledge tasks."""
 
-__version__ = '1.7.0'
+__version__ = '2.0.0'
 """Version number of the package."""
 
 from .benchmark import create_benchmark
