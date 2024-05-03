@@ -60,7 +60,7 @@ class HUMAN_GUIDELINES:
     2. Answers that have more information than requested (e.g. "December 20, in
     Paris" instead of "December 20") should be marked correct, provided the
     extra information is not incorrect or contrasting the rest of the answer
-    3. Answers with correct references but are unnecessarily verbose should be marked
+    3. Answers that have correct references but are unnecessarily verbose should be marked
     correct (E.g. "Thanks for asking this question! The correct answer is: ...)
     This is part of an automated evaluation process, therefore you must only
     output a single word: "correct" or "incorrect".
