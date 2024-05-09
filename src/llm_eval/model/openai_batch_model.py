@@ -74,23 +74,21 @@ class OpenAIBatchRequestModel(OpenAIModel):
 class OpenAIBatchRetrieveModel(OpenAIModel):
     def __init__(self, model_config: dict):
         super().__init__(model_config)
-        
+
         try:
             self._batch_id = model_config['batch_id']
         except KeyError as e:
             logger.error('`batch_id` not found in model configuration.')
             raise ValueError('Batch ID needs to be provided in model '
                              'configuration.') from e
-        
+
         # Boolean to enable lazy retrieval of results
         self._retrieved: bool = False
         self._results: dict[str, dict] = {}
 
     def _set_results(self):
-        results_list = self._retrieve_batch_results(self._batch_id,
-                                                    success=OAI_BATCH_SUCCESS,
-                                                    verify=True)
-        
+        results_list = self._retrieve_batch_results(verify=True)
+
         self._results = self._results_to_dict(results_list)
         self._retrieved = True
 
@@ -129,8 +127,7 @@ class OpenAIBatchRetrieveModel(OpenAIModel):
         the given batch ID after optinally checking for successful completion
         first."""
         if verify:
-            self._verify_batch_completion(self._batch_id, OAI_BATCH_SUCCESS,
-                                          raise_on_failure=True)
+            self._verify_batch_completion(raise_on_failure=True)
 
         batch_info = self.client.batches.retrieve(self._batch_id)
         output_file_id: str = batch_info.output_file_id

@@ -78,8 +78,14 @@ class LLMEvaluator(BaseEvaluator):
         return self._doc.doc_id
 
     def exit(self, message: str = None):
-        del self._model
+        """Perform any necessary cleanup operations."""
         super().exit(message)
+        
+        # Call exit on the model and delete the model
+        self._model.exit(message)
+        
+        logger.log(UPDATE, 'Deleting model instance.')
+        del self._model
 
 
 class LLMExtractEvaluator(LLMEvaluator):
@@ -98,7 +104,7 @@ class LLMExtractEvaluator(LLMEvaluator):
             references='\n'.join(references),
             response=response,
             extract_tag=self._extract_tag)
-    
+
     def _parse_eval(self, eval_str: str) -> tuple[bool, bool, bool]:
         extracted = extract_from_tag(eval_str, self._extract_tag)
         if extracted is not None:
