@@ -7,10 +7,11 @@ from ..helpers.documents import InfoDoc
 class OpenAIModel(BaseModel):
     def __init__(self, model_config: dict):
         self._config = model_config
-        client_kwargs = self._config.get('client_kwargs', {})
+        client_kwargs: dict = self._config.get('client_kwargs', {})
         self.client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'),
                              **client_kwargs)
-        self._completions_kwargs = self._config.get('completions_kwargs', {})
+        self._completions_kwargs: dict = self._config.get('completions_kwargs',
+                                                          {})
         self._doc = InfoDoc(**model_config)
 
     def _predict(self, prompt: str, **kwargs) -> str:

@@ -10,12 +10,12 @@ from ..helpers.constants.db import (DATASETS, BENCHMARK, METADATA, MODEL,
 from ..helpers.constants.logging import UPDATE
 from ..helpers.logging.tqdm_to_logger import TqdmToLogger
 from ..helpers.misc import truncate_response, extract_from_tag
+from ..helpers.constants.evaluator import TRUNCATE, EXTRACT
 from ..database import BaseDatabase
 from ..evaluator import BaseEvaluator
-from ..helpers.constants.evaluator import TRUNCATE, EXTRACT
-
-from . import logger
 from ..evaluator import logger as eval_logger
+from ..model import BaseModel
+from . import logger
 
 class BaseBenchmark(ABC):
     def __init__(self, bm_config: dict):
@@ -163,7 +163,7 @@ class BaseBenchmark(ABC):
             num_fewshot = n_train
         return num_fewshot
 
-    def run(self, model, db: BaseDatabase):
+    def run(self, model: BaseModel, db: BaseDatabase):
         """Run the benchmark with the given model configuration and store the
         results in the given database."""
         
@@ -210,6 +210,9 @@ class BaseBenchmark(ABC):
             prediction = model.predict(prompt, references=acceptable_answers)
             doc.response = prediction
             db.add_doc(BENCHMARK, self.BM_NAME, doc.doc_id, doc.to_json())
+        
+        # Perform cleanup for the model
+        model.exit()
 
     def compute_results(self, model_hash: str, db: BaseDatabase,
                         evaluator: BaseEvaluator) -> float:
@@ -273,6 +276,9 @@ class BaseBenchmark(ABC):
 
             # Update the evaluation statistics
             correct += 0 if result is None else int(result)
+
+        # Perform cleanup for the evaluator
+        evaluator.exit()
 
         # Return the final score
         return correct / self.total_questions

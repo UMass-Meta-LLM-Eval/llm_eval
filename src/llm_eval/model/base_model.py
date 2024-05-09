@@ -34,6 +34,11 @@ class BaseModel(ABC):
         """Return the SHA256 hash of the model's configuration as a base64
         string."""
 
+    def exit(self, message: str = None):
+        """Perform any necessary cleanup operations."""
+        logger.log(UPDATE, 'Exiting model: `%s`. Message: %s',
+                   self.config.get('name', 'UNKNOWN'),
+                   message)
 
 class DummyModel(BaseModel):
     """A dummy model that simply returns the prompt with a prefix and

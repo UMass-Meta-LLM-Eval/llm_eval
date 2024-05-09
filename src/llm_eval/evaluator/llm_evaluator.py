@@ -77,9 +77,9 @@ class LLMEvaluator(BaseEvaluator):
     def hashval(self):
         return self._doc.doc_id
 
-    def exit(self):
+    def exit(self, message: str = None):
         del self._model
-        super().exit()
+        super().exit(message)
 
 
 class LLMExtractEvaluator(LLMEvaluator):

@@ -8,6 +8,8 @@ from .hf_model import HFModel, LlamaModel, MistralModel, Phi2Model, BAAIModel
 from .human_model import HumanModel
 from .openai_model import OpenAIModel
 from .anthropic_model import AnthropicModel
+from .openai_batch_model import (OpenAIBatchRequestModel,
+                                 OpenAIBatchRetrieveModel)
 
 classes = {
     'DummyModel': DummyModel,
@@ -21,6 +23,8 @@ classes = {
     'AnthropicModel': AnthropicModel,
     'BAAIModel': BAAIModel,
     'ReferenceModel': ReferenceModel,
+    'OpenAIBatchRequestModel': OpenAIBatchRequestModel,
+    'OpenAIBatchRetrieveModel': OpenAIBatchRetrieveModel,
     # Add new models here
 }
 

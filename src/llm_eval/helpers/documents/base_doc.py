@@ -23,6 +23,7 @@ class BaseDoc(ABC):
     @property
     def doc_id(self) -> str:
         """Return the SHA256 hash of the object as a base64 string."""
+        # TODO: Use the helper function create_hash instead of this
         hashval = hashlib.sha256(self._encode()).digest()
         return base64.b64encode(hashval).decode('utf-8')
     
