@@ -124,7 +124,7 @@ class OpenAIBatchRetrieveModel(OpenAIModel):
 
         return False
 
-    def _retrieve_batch_results(self, verify: bool = True):
+    def _retrieve_batch_results(self, verify: bool = True) -> list[dict]:
         """Retrieve the results for a completed batch job corresponding the to
         the given batch ID after optinally checking for successful completion
         first."""
