@@ -56,7 +56,8 @@ class BaseHFModel(BaseModel):
             pad_token_id=self.tokenizer.eos_token_id,
             max_new_tokens=self._config.get('max_new_tokens',
                                             HF_MAX_NEW_TOKENS),
-            return_full_text=False)
+            return_full_text=False,
+            do_sample=False)
 
         response: str = sequences[0]['generated_text']
         return response.strip()
@@ -126,7 +127,8 @@ class BAAIModel(BaseHFModel):
         sequences = self.pipeline.generate(
             **self.tokenizer(prompt, return_tensors='pt').to('cuda'),
             max_new_tokens=self._config.get('max_new_tokens',
-                                            HF_MAX_NEW_TOKENS))
+                                            HF_MAX_NEW_TOKENS),
+            do_sample=False)
         response = self.tokenizer.decode(sequences[0])
 
         if response.startswith(self.starttoken):
