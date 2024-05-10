@@ -19,6 +19,8 @@ class OpenAIModel(BaseModel):
         response = self.client.chat.completions.create(
             model=self._config['model'],
             messages=messages,
+            temperature=0,
+            seed=self._config.get('seed', 0),
             **self._completions_kwargs).choices[0].message.content
         return response
 
