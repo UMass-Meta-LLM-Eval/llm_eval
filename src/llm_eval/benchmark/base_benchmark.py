@@ -277,9 +277,6 @@ class BaseBenchmark(ABC):
             # Update the evaluation statistics
             correct += 0 if result is None else int(result)
 
-        # Perform cleanup for the evaluator
-        evaluator.exit()
-
         # Return the final score
         return correct / self.total_questions
 
