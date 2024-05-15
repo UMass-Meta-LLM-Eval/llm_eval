@@ -1,0 +1,281 @@
+{
+    "metadata": {
+        "version": "v2.2.2"
+    },
+    "benchmarks": [
+        {
+            "name": "triviaQA-full-FINAL",
+            "cls": "TriviaQABenchmark",
+            "subset": "unfiltered",
+            "seed": 51,
+            "num_fewshot": 5,
+            "template": "CHAT_V2"
+        },
+        {
+            "name": "triviaQA-400-FINAL",
+            "cls": "TriviaQABenchmark",
+            "subset": "unfiltered",
+            "seed": 51,
+            "num_samples": 400,
+            "num_fewshot": 5,
+            "template": "CHAT_V2"
+        }
+    ],
+    "models": [
+        {
+            "name": "llama2-7b-chat",
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-7b-chat-hf",
+            "chat": true
+        },
+        {
+            "name": "mistral-7b-chat",
+            "cls": "MistralModel",
+            "model": "Mistral-7B-Instruct-v0.2",
+            "chat": true
+        },
+        {
+            "name": "llama2-13b-chat",
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-13b-chat-hf",
+            "chat": true
+        },
+        {
+            "name": "llama2-70b-chat",
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-70b-chat-hf",
+            "chat": true
+        },
+        {
+            "name": "gpt-4t",
+            "cls": "OpenAIBatchRetrieveModel",
+            "model": "gpt-4-turbo-2024-04-09",
+            "chat": true,
+            "batch_id": "batch_3JhmBeZDrn0Iy7L4iMKZk43M"
+        }
+    ],
+    "evaluators": [
+        {
+            "name": "eval-exact-match",
+            "cls": "ExactMatchEvaluator",
+            "cased": false,
+            "truncate": "newlinequestion"
+        },
+        {
+            "name": "eval-contains-match",
+            "cls": "ContainsMatchEvaluator",
+            "cased": false,
+            "truncate": "newlinequestion"
+        },
+        {
+            "name": "eval-eleuther",
+            "cls": "ExactMatchEvaluator",
+            "cased": false,
+            "truncate": "eleutherai"
+        },
+        {
+            "name": "eval-gpt-3.5t",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "OpenAIModel",
+                "model": "gpt-3.5-turbo-0125"
+            },
+            "truncate": "newlinequestion",
+            "template": "HUMAN_GUIDELINES_V1_2"
+        },
+        {
+            "name": "eval-gpt-4t",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "OpenAIModel",
+                "model": "gpt-4-turbo-2024-04-09"
+            },
+            "truncate": "newlinequestion",
+            "template": "HUMAN_GUIDELINES_V1_2"
+        },
+        {
+            "name": "eval-gemma2b-it",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "HFModel",
+                "model": "google/gemma-2b-it",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "HUMAN_GUIDELINES_V1_2"
+        },
+        {
+            "name": "eval-llama-7b-chat",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "LlamaModel",
+                "model": "meta-llama/Llama-2-7b-chat-hf",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "HUMAN_GUIDELINES_V1_2"
+        },
+        {
+            "name": "eval-llama3-8B-Instruct",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "LlamaModel",
+                "model": "Meta-Llama-3-8B-Instruct",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "HUMAN_GUIDELINES_V1_2"
+        },
+        {
+            "name": "eval-llama-13b-chat",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "LlamaModel",
+                "model": "meta-llama/Llama-2-13b-chat-hf",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "HUMAN_GUIDELINES_V1_2"
+        },
+        {
+            "name": "eval-mistral",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "MistralModel",
+                "model": "Mistral-7B-Instruct-v0.2",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "HUMAN_GUIDELINES_V1_2"
+        },
+        {
+            "name": "eval-judgelm",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "BAAIModel",
+                "model": "BAAI/JudgeLM-7B-v1.0"
+            },
+            "truncate": "newlinequestion",
+            "template": "HUMAN_GUIDELINES_V1_2"
+        },
+        {
+            "name": "eval-qwen-0.5b",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "HFModel",
+                "model": "Qwen/Qwen1.5-0.5B-Chat",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "DEFAULT_V2"
+        },
+        {
+            "name": "eval-qwen-1.8b",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "HFModel",
+                "model": "Qwen/Qwen1.5-1.8B-Chat",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "DEFAULT_V2"
+        },
+        {
+            "name": "eval-qwen-4b",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "HFModel",
+                "model": "Qwen/Qwen1.5-4B-Chat",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "DEFAULT_V2"
+        },
+        {
+            "name": "eval-qwen-7b",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "HFModel",
+                "model": "Qwen/Qwen1.5-7B-Chat",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "DEFAULT_V2"
+        },
+        {
+            "name": "eval-qwen-14b",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "HFModel",
+                "model": "Qwen/Qwen1.5-14B-Chat",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "DEFAULT_V2"
+        },
+        {
+            "name": "eval-mixtral",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "MistralModel",
+                "model": "Mixtral-8x7B-Instruct-v0.1",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "HUMAN_GUIDELINES_V1_2"
+        },
+        {
+            "name": "eval-llama-70b-chat",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "LlamaModel",
+                "model": "meta-llama/Llama-2-70b-chat-hf",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "HUMAN_GUIDELINES_V1_2"
+        },
+        {
+            "name": "eval-llama3-70B-Instruct",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "LlamaModel",
+                "model": "Meta-Llama-3-70B-Instruct",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "HUMAN_GUIDELINES_V1_2"
+        },
+        {
+            "name": "eval-qwen-72b",
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "HFModel",
+                "model": "Qwen/Qwen1.5-72B-Chat",
+                "chat": true,
+                "max_new_tokens": 32
+            },
+            "truncate": "newlinequestion",
+            "template": "DEFAULT_V2"
+        },
+        {
+            "name": "human-eval",
+            "cls": "HumanEvaluator",
+            "truncate": "newlinequestion",
+            "error_analysis": true
+        }
+    ]
+}
