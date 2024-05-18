@@ -172,3 +172,48 @@ class TAG:
 
     Evaluation (correct/incorrect):
     ''').strip()
+
+class HUMAN_GUIDELINES_V3:
+    PROMPT: str = dedent('''
+    Review the Question and Examine the Reference: Carefully read and
+    understand the question. Carefully read each of the reference provided for
+    the question:
+    Consider the following error categories that could lead to an incorrect response: 
+    1. Incorrect Entity (Wrong answer)
+    2. Too many Entities (Extra responses beyond the correct answers)
+    3. Underspecification (Incomplete answer)
+    4. Overspecification (Correct answer but with additional incorrect information)
+    5. Answers not in response
+    This is part of an automated evaluation process, therefore you must only
+    output a single word: "correct" or "incorrect".
+                                         
+    Question:
+    {question}
+
+    References:
+    {references}
+
+    Model Response:
+    {response}
+
+    Evaluation (correct/incorrect):
+    ''').strip()
+
+
+class HUMAN_GUIDELINES_V4:
+    PROMPT: str = dedent('''
+    Review the question and examine the references provided, then evaluate the model's response
+    This is part of an automated evaluation process, therefore you must only
+    output a single word: "correct" or "incorrect".
+                                         
+    Question:
+    {question}
+
+    References:
+    {references}
+
+    Model Response:
+    {response}
+
+    Evaluation (correct/incorrect):
+    ''').strip()
