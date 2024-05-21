@@ -14,6 +14,7 @@ class OpenAIBatchRequestModel(OpenAIModel):
     def __init__(self, model_config: dict):
         super().__init__(model_config)
         self._request_data: list[dict] = []
+        self._request_hashes: set[str] = set()
 
     def _upload_jsonl(self, data: list[dict], purpose: str) -> str:
         """Upload the given data for the given purpose to OpenAI
@@ -40,6 +41,10 @@ class OpenAIBatchRequestModel(OpenAIModel):
     
     def _predict(self, prompt: str, **kwargs) -> str:
         prompt_hash = create_hash(prompt)
+        if prompt_hash in self._request_hashes:
+            return f'prompt already added ({prompt_hash[-4:]})'
+        
+        self._request_hashes.add(prompt_hash)
         messages = [{'role': 'user', 'content': prompt}]
         request_object = {
             'custom_id': prompt_hash,

@@ -65,6 +65,9 @@ def evaluate(db: BaseDatabase, config: dict):
         evaluator = create_evaluator(evaluator_cfg)
         for (bm_cfg, model_cfg) in product(config['benchmarks'],
                                            config['models']):
+            logger.log(logging_constants.UPDATE, 'Computing results for '
+                       f'benchmark `{bm_cfg.get("name", "unknown")}`, '
+                       f'model `{model_cfg.get("name", "unknown")}`')
             benchmark = create_benchmark(bm_cfg)
             model_hash = InfoDoc(**model_cfg).doc_id
             results = benchmark.compute_results(model_hash, db, evaluator)
