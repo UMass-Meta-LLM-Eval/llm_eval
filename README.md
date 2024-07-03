@@ -1,34 +1,16 @@
 # README
 
-## Important Destinations
-Project root on unity: `/work/pi_dhruveshpate_umass_edu/grp22/` <br />
-Repo: `/work/pi_dhruveshpate_umass_edu/grp22/src/llm_eval` <br />
-Conda env: `/work/pi_dhruveshpate_umass_edu/grp22/conda/envs/llm-eval` <br />
+This repository contains the code for the paper "[Judging the Judges: Evaluating Alignment and Vulnerabilities in LLMs-as-Judges](https://arxiv.org/abs/2406.12624)".
 
-## Creating Personal Environments
-`conda create --name llm-parsing python=3.9.7 pip` <br />
-`pip install -r requirements.txt` <br />
-`conda activate llm-parsing` <br />
+![Judging the Judges](images/fig1.png)
 
-## Interactive Sessions
+## Abstract
 
-Activate a CPU interactive session and load modules:
+Offering a promising solution to the scalability challenges associated with human evaluation, the LLM-as-a-judge paradigm is rapidly gaining traction as an approach to evaluating large language models (LLMs). However, there are still many open questions about the strengths and weaknesses of this paradigm, and what potential biases it may hold. In this paper, we present a comprehensive study of the performance of various LLMs acting as judges. We leverage TriviaQA as a benchmark for assessing objective knowledge reasoning of LLMs and evaluate them alongside human annotations which we found to have a high inter-annotator agreement. Our study includes 9 judge models and 9 exam taker models -- both base and instruction-tuned. We assess the judge model's alignment across different model sizes, families, and judge prompts. Among other results, our research rediscovers the importance of using Cohen's kappa as a metric of alignment as opposed to simple percent agreement, showing that judges with high percent agreement can still assign vastly different scores. We find that both Llama-3 70B and GPT-4 Turbo have an excellent alignment with humans, but in terms of ranking exam taker models, they are outperformed by both JudgeLM-7B and the lexical judge Contains, which have up to 34 points lower human alignment. Through error analysis and various other studies, including the effects of instruction length and leniency bias, we hope to provide valuable lessons for using LLMs as judges in the future.
 
-```bash
-salloc -N 1 -n 1 -c 8 -p cpu-preempt -t 2:00:00 --mem=8G
-```
+# Running experiments
 
-Activate a GPU interactive session and load modules:
-
-```bash
-salloc -N 1 -n 1 -c 8 -p gpu-preempt -t 2:00:00 --mem=8G --gpus=1
-```
-
-For bigger GPU, set the constraint
-
-```bash
-salloc -N 1 -n 1 -p gpu,gpu-preempt -t 2:00:00 --mem=8G --gpus=1 --constraint="[a100|m40|rtx8000]"
-```
+All the experiments in the paper were run using the code in this repository, on the Unity cluster at the University of Massachusetts Amherst and stored on a MongoDB database.
 
 ## Creating configs
 
@@ -55,8 +37,6 @@ A sample config file is shown below:
 {
     "metadata": {
         "version": "v1.6.0",
-        "preset": "A2",
-        "config_id": "BN"
     },
     "benchmarks": [
         {
@@ -161,17 +141,6 @@ you can run the following command:
 
 ```bash
 python main.py -i inspection
-```
-
-## Submitting a job
-
-To submit a job to the cluster, you can use the `main.sh` script with `sbatch`.
-The script takes the same arguments as `main.py`, for example, to submit a
-benchmark job using the config present in `configs/benchmark.json`, you can run
-the following command:
-
-```bash
-sbatch main.sh -b benchmark
 ```
 
 # Models
@@ -318,22 +287,9 @@ Evaluators have the following attributes:
     to wrap its evaluation inside a specified tag. If the `eval_tag` is `None`,
     the raw output is used as the answer. Default is `None`.
 
-# Analysis Scripts
 
-In version 1.7.0, helper functions for analyzing the results of the evaluations
-were added to the `analysis` sub-package. In addition, a new console command
-`llm-analysis` was added to the package.
+# Cite Us
 
-The command can be run as follows:
-
-```bash
-llm-analysis <func-name> <args> <kwargs>
-```
-
-If you have a previous version of the package installed, you may need to
-uninstall and reinstall the package to get the new console command.
-
-# Cite us
 ```bibtex
 @misc{thakur2024judging,
       title={Judging the Judges: Evaluating Alignment and Vulnerabilities in {LLMs}-as-Judges}, 
