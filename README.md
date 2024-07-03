@@ -334,9 +334,9 @@ If you have a previous version of the package installed, you may need to
 uninstall and reinstall the package to get the new console command.
 
 # Cite us
-```
-@misc{thakur2024judgingjudgesevaluatingalignment,
-      title={Judging the Judges: Evaluating Alignment and Vulnerabilities in LLMs-as-Judges}, 
+```bibtex
+@misc{thakur2024judging,
+      title={Judging the Judges: Evaluating Alignment and Vulnerabilities in {LLMs}-as-Judges}, 
       author={Aman Singh Thakur and Kartik Choudhary and Venkat Srinik Ramayapally and Sankaran Vaidyanathan and Dieuwke Hupkes},
       year={2024},
       eprint={2406.12624},
