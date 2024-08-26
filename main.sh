@@ -4,12 +4,12 @@
 #SBATCH -n 1                # Number of tasks requested
 #SBATCH -p gpu-preempt      # Partition
 #SBATCH -c 8                # Number of cores requested
-#SBATCH -t 4:00:00          # Time (Days-Hours:Minutes:Seconds)
+#SBATCH -t 1:00:00          # Time (Days-Hours:Minutes:Seconds)
 #SBATCH --mem=8G            # memory per node (defaults to MB without "G")
-#SBATCH --gpus=1            # Number of GPUs
+#SBATCH --gpus=3            # Number of GPUs
 #SBATCH --mail-type=ALL     # Type of email notification- BEGIN,END,FAIL,ALL
-#SBATCH --constraint=vram16 # GPU type
 #SBATCH -J poc-llama7b      # Job Name
+#SBATCH --constraint=a100   # GPU type
 #SBATCH -o logs/%x-%j.out   # Standard output
 #SBATCH -e logs/%x-%j.err   # Standard error
 
@@ -17,14 +17,14 @@
 module load miniconda/22.11.1-1
 module load gcc/11.2.0
 module load cuda/12.2.1
-conda activate /work/pi_dhruveshpate_umass_edu/grp22/users/<<username>>/conda/envs/<<env-name>>/
+conda activate llm-parsing
 
 # Change to the project directory
-cd /work/pi_dhruveshpate_umass_edu/grp22/users/<<username>>/projects/llm_eval/
+cd /home/amansinghtha_umass_edu/llm_eval_vAug25/llm_eval/
 
 # Run the script
 echo "Running main.py"
-python main.py "$@" -j ${SLURM_JOBID}
+python main.py -e configV1_Base70B
 
 # Done
 exit_code=$?

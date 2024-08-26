@@ -58,6 +58,24 @@ def evaluate(db: BaseDatabase, config: dict):
         evaluators = [config['evaluator']]
     else:
         evaluators = config['evaluators']
+
+    verify_dict = {
+        'hBFkW8jsmb783tJKWEPVCQ01ro2IYjpOoUc1eGXWBJI=' : [
+            '/ecWvZHbtyX7/gUC21zmvm3HethlrqM0fzE5+KfygoI=',
+            'BnklNsT6sATEZaS1DBsjiGo86Qo3fbjfY+yJm6adTww=',
+            'P4lpfsmej/H3568NnhyFsHrsauKiAQLrOEn6YQPB7FA=',
+            'qHEKiplT1dMkJmk7whm1tIsYztOgKkyvssNaqfiZkGc=',
+            'kDqQgE6FK0N2hi2utsICRroXjJRrgZGZYefWjpDK3a0=',
+            'mRFC8iMc9rV4ATE8rNmEnoap17yzRgxY9O2/Fup3Gss='
+        ],
+        'IVcUn4eNHUXVhYHVqW6+x0nfxM3/kXKToJSANHVcM+4=' :[
+            'QY82FktpXys5zt+pP9ioKv/5Pb9hIV8UhYi5dP4lKkk=',
+            'd6k7yj+hkP8MMPaOdiukyiOg6zBFiSrsW+UPZPupcDM=',
+            'mRFC8iMc9rV4ATE8rNmEnoap17yzRgxY9O2/Fup3Gss=',
+            't8cxUYmgHiL0MDdiVWcv3kDNbzsq2c41sad3UhmPjlE='
+        ]
+    }
+    
     for evaluator_cfg in evaluators:
         logger.log(logging_constants.UPDATE, 'Running evaluator: '
                    f'{evaluator_cfg.get("name", "unknown")}')
@@ -67,6 +85,15 @@ def evaluate(db: BaseDatabase, config: dict):
                                            config['models']):
             benchmark = create_benchmark(bm_cfg)
             model_hash = InfoDoc(**model_cfg).doc_id
+            if benchmark.hashval not in verify_dict:
+                print('This is not a valid Benchmark - ', benchmark.hashval)
+                exit(1)
+            if model_hash not in verify_dict[benchmark.hashval]:
+                print('This is not a valid model hash - ', model_hash)
+                exit(1)
+            print(benchmark.hashval)
+            print(model_hash)
+            print(evaluator.hashval)
             results = benchmark.compute_results(model_hash, db, evaluator)
             logger.log(logging_constants.UPDATE, 'Computed results for '
                           f'evaluator `{evaluator_cfg.get("name", "unknown")}`, '
