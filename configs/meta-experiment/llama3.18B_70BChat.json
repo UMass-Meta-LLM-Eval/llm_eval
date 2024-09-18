@@ -1,0 +1,32 @@
+{
+    "benchmarks": [
+        {
+            "cls": "TriviaQABenchmark",
+            "name": "triviaQA-600-human-align-llama3170B-v1.5.0",
+            "num_fewshot": 5,
+            "num_samples": 600,
+            "seed": 51,
+            "subset": "unfiltered"
+        }
+    ],
+    "models": [
+        {
+            "chat": true,
+            "cls": "LlamaModel",
+            "model": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+            "name": "llama3.1-70b-chat"
+        }
+    ],
+    "evaluators": [
+        {
+            "cls": "ExactMatchEvaluator",
+            "name": "exact-match-newline",
+            "truncate": "newlinequestion"
+        },
+        {
+            "cls": "HumanEvaluator",
+            "name": "human-aman",
+            "truncate": "newlinequestion"
+        }
+    ]
+}

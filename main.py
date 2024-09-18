@@ -73,6 +73,9 @@ def evaluate(db: BaseDatabase, config: dict):
             'd6k7yj+hkP8MMPaOdiukyiOg6zBFiSrsW+UPZPupcDM=',
             'mRFC8iMc9rV4ATE8rNmEnoap17yzRgxY9O2/Fup3Gss=',
             't8cxUYmgHiL0MDdiVWcv3kDNbzsq2c41sad3UhmPjlE='
+        ],
+        'wKaTVlaOJORPi0RY0yGL1XdBOPoHVYbmuhm95ldzsA0=' : [
+            'EbP1lNbCJ41frKXbibgwfkNTTeybeN8/pkKQHLsinFE='
         ]
     }
     
