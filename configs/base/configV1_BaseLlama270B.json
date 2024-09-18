@@ -1,0 +1,53 @@
+{
+    "benchmarks": [
+        {
+            "name": "triviaQA-400-v1.5.0",
+            "cls": "TriviaQABenchmark",
+            "subset": "unfiltered",
+            "seed": 51,
+            "num_samples": 400,
+            "num_fewshot": 5
+        }
+    ],
+    "models": [
+        {
+            "chat": true,
+            "cls": "OpenAIModel",
+            "model": "gpt-4-turbo-2024-04-09",
+            "name": "gpt-4t"
+        },
+        {
+            "name": "llama2-7b-base",
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-7b-hf"
+        },
+        {
+            "cls": "MistralModel",
+            "model": "mistralai/Mistral-7B-v0.1",
+            "name": "mistral-7B"
+        },
+        {
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-13b-hf",
+            "name": "llama2-13b-base"
+        },
+        {
+            "cls": "LlamaModel",
+            "model": "meta-llama/Llama-2-70b-hf",
+            "name": "llama2-70b-base"
+        }
+    ],
+    "evaluators": [
+        {
+            "cls": "LLMEvaluator",
+            "model_config": {
+                "cls": "LlamaModel",
+                "model": "meta-llama/Llama-2-70b-chat-hf",
+                "chat": true
+            },
+            "name": "eval-llama70b-human_guidelines",
+            "template": "HUMAN_GUIDELINES_V1_2",
+            "truncate": "newlinequestion"
+        }
+    ]
+}

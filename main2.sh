@@ -4,7 +4,7 @@
 #SBATCH -n 1                # Number of tasks requested
 #SBATCH -p gpu-preempt      # Partition
 #SBATCH -c 8                # Number of cores requested
-#SBATCH -t 4:00:00          # Time (Days-Hours:Minutes:Seconds)
+#SBATCH -t 1:00:00          # Time (Days-Hours:Minutes:Seconds)
 #SBATCH --mem=8G            # memory per node (defaults to MB without "G")
 #SBATCH --gpus=2            # Number of GPUs
 #SBATCH --mail-type=ALL     # Type of email notification- BEGIN,END,FAIL,ALL
@@ -24,7 +24,7 @@ cd /home/amansinghtha_umass_edu/llm_eval_vAug25/llm_eval/
 
 # Run the script
 echo "Running main.py"
-python main.py -e base/configV1_BaseLlama270B
+python main.py -e chat/configV1_ChatLlama270B
 
 # Done
 exit_code=$?

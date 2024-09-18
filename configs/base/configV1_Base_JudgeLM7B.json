@@ -41,22 +41,10 @@
         {
             "cls": "LLMEvaluator",
             "model_config": {
-                "cls": "OpenAIModel",
-                "model": "gpt-4-turbo-2024-04-09",
-                "chat": true
+                "cls": "BAAIModel",
+                "model": "BAAI/JudgeLM-7B-v1.0"
             },
-            "name": "eval-gpt4t-human_guidelines",
-            "template": "HUMAN_GUIDELINES_V1_2",
-            "truncate": "newlinequestion"
-        },
-        {
-            "cls": "LLMEvaluator",
-            "model_config": {
-                "cls": "LlamaModel",
-                "model": "Meta-Llama-3-70B-Instruct",
-                "chat": true
-            },
-            "name": "eval-llama3-70B-Instruct-human_guidelines",
+            "name": "eval-judgelm_human_guidelines",
             "template": "HUMAN_GUIDELINES_V1_2",
             "truncate": "newlinequestion"
         }
